@@ -1,0 +1,7 @@
+## Interface: 73000
+## Title: CrazyForMounts
+## Version: 1.2
+## Author: phistoh
+## Notes: Provides a command to summon a random mount from a predefined table.
+CrazyForMounts_Tables.lua
+CrazyForMounts.lua
