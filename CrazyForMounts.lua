@@ -141,11 +141,19 @@ local function updateMountList()
 	
 	for i=1, #buttons do
 		button = buttons[i]
+		
+		button.personalFavoriteGround = button:CreateTexture(nil, 'OVERLAY')
+		button.personalFavoriteGround:Hide()
+		button.personalFavoriteGround:SetTexture('Interface\\MINIMAP\\TRACKING\\StableMaster')
+		button.personalFavoriteGround:SetPoint('CENTER', button, 'TOPRIGHT', 8, 8)
+		button.personalFavoriteGround:SetAllPoints()
+		
 		displayIndex = i + offset
 		if displayIndex <= numMounts and numMounts > 0 then
 			creatureName, _, _, _, _, _, _, _, _, _, _, mountID = C_MountJournal.GetDisplayedMountInfo(displayIndex)
 			if personalMountDB.ground[mountID] then
 				creatureName = creatureName..' *'
+				button.personalFavoriteGround:Show()
 			end
 			if personalMountDB.flying[mountID] then
 				creatureName = creatureName..' +'
