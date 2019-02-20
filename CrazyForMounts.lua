@@ -145,7 +145,7 @@ local function updateDB(mountID, flyable, addMount)
 	end
 end
 
--- -- attaches '*' to every mount in personalMountDB
+-- -- attaches icons to every mount in personalMountDB
 -- local function updateMountList()
 	-- local scrollFrame = MountJournal.ListScrollFrame
 	-- local buttons = scrollFrame.buttons
@@ -163,17 +163,22 @@ end
 		
 		-- displayIndex = i + offset
 		-- if displayIndex <= numMounts and numMounts > 0 then
-			-- creatureName, _, _, _, _, _, _, _, _, _, _, mountID = C_MountJournal.GetDisplayedMountInfo(displayIndex)
+			-- _, _, _, _, _, _, _, _, _, _, _, mountID = C_MountJournal.GetDisplayedMountInfo(displayIndex)
 			-- if personalMountDB.ground[mountID] then
-				-- creatureName = creatureName..' *'
 				-- button.personalFavoriteGround:Show()
+			-- else
+				-- button.personalFavoriteGround:Hide()
 			-- end
 			-- if personalMountDB.flying[mountID] then
-				-- creatureName = creatureName..' +'
+				-- 
 			-- end
-			-- button.name:SetText(creatureName)
+		-- else
+			-- button.personalFavoriteGround:Hide()
 		-- end
 	-- end
+	-- local MOUNT_BUTTON_HEIGHT = 46
+	-- local totalHeight = numMounts * MOUNT_BUTTON_HEIGHT
+	-- HybridScrollFrame_Update(scrollFrame, totalHeight, scrollFrame:GetHeight())
 -- end
 
 local function initAddon()
