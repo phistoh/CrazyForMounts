@@ -10,7 +10,7 @@ local locked = true
 --   AUXILIARY STUFF   --
 -------------------------
 
-local function getLength(tbl)
+function phis.getLength(tbl)
 	length = 0
 	for k,v in pairs(tbl) do
 		length = length + 1
@@ -19,7 +19,7 @@ local function getLength(tbl)
 end
 
 -- checks whether the player can actually fly
-local function phis.IsFlyableArea()
+function phis.IsFlyableArea()
 	-- default WoW check
 	if not IsFlyableArea() then
 		return false
@@ -44,7 +44,7 @@ end
 --   FRAME FACTORIES   --
 -------------------------
 
-local function createInset(name, parent, w, h, anchor, ofsX, ofsY, content, label)
+local function createInset(name, parent, w, h, anchor, ofsX, ofsY, label, content)
 	local newInset = CreateFrame('Frame', name, parent, 'InsetFrameTemplate3')
 	newInset:SetSize(w,h)
 	newInset:SetPoint(anchor, ofsX, ofsY)
@@ -56,7 +56,7 @@ local function createInset(name, parent, w, h, anchor, ofsX, ofsY, content, labe
 	
 	newInset.label = newInset:CreateFontString(name..'LabelFontString', 'ARTWORK', 'GameFontNormalSmall')
 	newInset.label:SetPoint('LEFT', 10, 0)
-	newInset.label:SetPoint('RIGHT', newContent, 'LEFT', -3, 0)
+	newInset.label:SetPoint('RIGHT', newInset.content, 'LEFT', -3, 0)
 	newInset.label:SetJustifyH('LEFT')
 	newInset.label:SetText(label)
 	
@@ -79,9 +79,11 @@ local function createCheckbox(name, parent, anchor, relativeFrame, relativePoint
 	end)
 	
 	newCheckbox.background = newCheckbox:CreateTexture(nil, 'BACKGROUND')
-	newCheckbox.background:SetAllPoints()
+	newCheckbox.background:SetWidth(20)
+	newCheckbox.background:SetHeight(20)
 	newCheckbox.background:SetTexture(bgPath)
-	
+	newCheckbox.background:SetPoint('CENTER',newCheckbox)
+
 	return newCheckbox
 end
 
@@ -132,36 +134,36 @@ local function updateDB(mountID, flyable, addMount)
 	end
 end
 
--- attaches '*' to every mount in personalMountDB
-local function updateMountList()
-	local scrollFrame = MountJournal.ListScrollFrame
-	local buttons = scrollFrame.buttons
-	local offset = HybridScrollFrame_GetOffset(scrollFrame)
-	local numMounts = C_MountJournal.GetNumDisplayedMounts()
+-- -- attaches '*' to every mount in personalMountDB
+-- local function updateMountList()
+	-- local scrollFrame = MountJournal.ListScrollFrame
+	-- local buttons = scrollFrame.buttons
+	-- local offset = HybridScrollFrame_GetOffset(scrollFrame)
+	-- local numMounts = C_MountJournal.GetNumDisplayedMounts()
 	
-	for i=1, #buttons do
-		button = buttons[i]
+	-- for i=1, #buttons do
+		-- button = buttons[i]
 		
-		button.personalFavoriteGround = button:CreateTexture(nil, 'OVERLAY')
-		button.personalFavoriteGround:Hide()
-		button.personalFavoriteGround:SetTexture('Interface\\MINIMAP\\TRACKING\\StableMaster')
-		button.personalFavoriteGround:SetPoint('CENTER', button, 'TOPRIGHT', 8, 8)
-		button.personalFavoriteGround:SetAllPoints()
+		-- button.personalFavoriteGround = button:CreateTexture(nil, 'OVERLAY')
+		-- button.personalFavoriteGround:Hide()
+		-- button.personalFavoriteGround:SetTexture('Interface\\MINIMAP\\TRACKING\\StableMaster')
+		-- button.personalFavoriteGround:SetSize(22,22)
+		-- button.personalFavoriteGround:SetPoint('CENTER', button, 'TOPRIGHT', -12, -12)
 		
-		displayIndex = i + offset
-		if displayIndex <= numMounts and numMounts > 0 then
-			creatureName, _, _, _, _, _, _, _, _, _, _, mountID = C_MountJournal.GetDisplayedMountInfo(displayIndex)
-			if personalMountDB.ground[mountID] then
-				creatureName = creatureName..' *'
-				button.personalFavoriteGround:Show()
-			end
-			if personalMountDB.flying[mountID] then
-				creatureName = creatureName..' +'
-			end
-			button.name:SetText(creatureName)
-		end
-	end
-end
+		-- displayIndex = i + offset
+		-- if displayIndex <= numMounts and numMounts > 0 then
+			-- creatureName, _, _, _, _, _, _, _, _, _, _, mountID = C_MountJournal.GetDisplayedMountInfo(displayIndex)
+			-- if personalMountDB.ground[mountID] then
+				-- creatureName = creatureName..' *'
+				-- button.personalFavoriteGround:Show()
+			-- end
+			-- if personalMountDB.flying[mountID] then
+				-- creatureName = creatureName..' +'
+			-- end
+			-- button.name:SetText(creatureName)
+		-- end
+	-- end
+-- end
 
 local function initAddon()
 	--- SETUP VARIABLES ---
@@ -175,96 +177,27 @@ local function initAddon()
 	end
 
 	--- CREATE AND ATTACH FRAMES ---
+	local groundMountInset = createInset('groundMountInset', MountJournal, 100, 20, 'BOTTOMRIGHT', -7, 5, 'Ground: ', personalMountCount.ground)
+	local flyingMountInset = createInset('flyingMountInset', groundMountInset, 100, 20, 'LEFT', -110, 0, 'Flying: ', personalMountCount.flying)
 	
-	-- -- number of selected ground mounts	
-	-- local groundMountInset = CreateFrame('Frame', 'groundMountInset', MountJournal, 'InsetFrameTemplate3')
-	-- groundMountInset:SetSize(100,20)
-	-- groundMountInset:SetPoint('BOTTOMRIGHT', -7, 5)
-	-- local groundMountLabel = groundMountInset:CreateFontString('groundMountLabelFontString', 'ARTWORK', 'GameFontHighlightSmall')
-	-- groundMountLabel:SetPoint('RIGHT', -10, 0)
-	-- groundMountLabel:SetJustifyH('RIGHT')
-	-- groundMountLabel:SetText(personalMountCount.ground)
-	-- local groundMountCount = groundMountInset:CreateFontString('groundMountCountFontString', 'ARTWORK', 'GameFontNormalSmall')
-	-- groundMountCount:SetPoint('LEFT', 10, 0)
-	-- groundMountCount:SetPoint('RIGHT', groundMountLabel, 'LEFT', -3, 0)
-	-- groundMountCount:SetJustifyH('LEFT')
-	-- groundMountCount:SetText('Ground: ')
-	local groundMountInset = createInset('groundMountInset', MountJournal, 100, 20, 'BOTTOMRIGHT', -7, 5, personalMountCount.ground, 'Ground: ')
-	
-	-- number of selected flying mounts
-	-- local flyingMountInset = CreateFrame('Frame', 'flyingMountInset', MountJournal, 'InsetFrameTemplate3')
-	-- flyingMountInset:SetSize(100,20)
-	-- flyingMountInset:SetPoint('RIGHT', groundMountInset, 'LEFT', -10, 0)
-	-- local flyingMountLabel = flyingMountInset:CreateFontString('groundMountLabelFontString', 'ARTWORK', 'GameFontHighlightSmall')
-	-- flyingMountLabel:SetPoint('RIGHT', -10, 0)
-	-- flyingMountLabel:SetJustifyH('RIGHT')
-	-- flyingMountLabel:SetText(personalMountCount.flying)
-	-- local flyingMountCount = flyingMountInset:CreateFontString('groundMountCountFontString', 'ARTWORK', 'GameFontNormalSmall')
-	-- flyingMountCount:SetPoint('LEFT', 10, 0)
-	-- flyingMountCount:SetPoint('RIGHT', flyingMountLabel, 'LEFT', -3, 0)
-	-- flyingMountCount:SetJustifyH('LEFT')
-	-- flyingMountCount:SetText('Flying: ')
-	local flyingMountInset = createInset('flyingMountInset', MountJournal, 100, 20, 'RIGHT', -10, 0, personalMountCount.flying, 'Flying: ')
-	
-	-- checkbox for ground mounts
-	-- local checkBoxGround = CreateFrame('CheckButton', 'CrazyForMountsCheckBoxGround', MountJournal.MountDisplay, 'UICheckButtonTemplate')
-	-- checkBoxGround:SetPoint('TOPRIGHT', MountJournal.MountDisplay, 'BOTTOMRIGHT', -10, 50)
-	-- checkBoxGround.tooltip = 'Add this mount to your personal list of ground mounts'
-	-- checkBoxGround:SetScript('OnClick', function()
-		-- local checked = checkBoxGround:GetChecked()
-		-- PlaySound(checked and SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF)
-		-- local mountID = MountJournal.selectedMountID
-		-- updateDB(mountID, false, checked)
-		-- groundMountCount:SetText(personalMountCount.ground)
-		-- updateMountList()
-	-- end)
-	-- checkBoxGround:SetScript('OnEnter', function()
-		-- GameTooltip_SetDefaultAnchor(GameTooltip, UIParent)
-		-- GameTooltip:SetPoint('BOTTOMRIGHT', checkBoxGround, 'TOPRIGHT', 0, 0);
-		-- GameTooltip:SetText('Add this mount to your personal ground mounts')
-		-- GameTooltip:Show()
-	-- end)
-	-- checkBoxGround:SetScript('OnLeave', function()
-		-- GameTooltip:Hide()
-	-- end)
-	local checkBoxGround = createCheckbox('CrazyForMountsCheckBoxGround', MountJournal.MountDisplay, 'TOPRIGHT', MountJournal.MountDisplay, 'BOTTOMRIGHT', -10, 50, 'Add this mount to your personal ground mounts', 'Interface\\MINIMAP\\TRACKING\\FlightMaster')
+	local checkBoxGround = createCheckbox('CrazyForMountsCheckBoxGround', MountJournal.MountDisplay, 'TOPRIGHT', MountJournal.MountDisplay, 'BOTTOMRIGHT', -10, 50, 'Add this mount to your personal ground mounts', 'Interface\\MINIMAP\\TRACKING\\StableMaster')
 	checkBoxGround:SetScript('OnClick', function(self)
 		local checked = self:GetChecked()
 		PlaySound(checked and SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF)
 		local mountID = MountJournal.selectedMountID
 		updateDB(mountID, false, checked)
 		groundMountInset.content:SetText(personalMountCount.ground)
-		updateMountList()
+		-- updateMountList()
 	end)
 	
-	-- checkbox for flying mounts
-	-- local checkBoxFlying = CreateFrame('CheckButton', 'CrazyForMountsCheckBoxFlying', MountJournal.MountDisplay, 'UICheckButtonTemplate')
-	-- checkBoxFlying:SetPoint('RIGHT', checkBoxGround, 'LEFT', -10, 0)
-	-- checkBoxFlying:SetScript('OnClick', function()
-		-- local checked = checkBoxFlying:GetChecked()
-		-- PlaySound(checked and SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF)
-		-- local mountID = MountJournal.selectedMountID
-		-- updateDB(mountID, true, checked)
-		-- flyingMountCount:SetText(personalMountCount.flying)
-		-- updateMountList()
-	-- end)
-	-- checkBoxFlying:SetScript('OnEnter', function()
-		-- GameTooltip_SetDefaultAnchor(GameTooltip, UIParent)
-		-- GameTooltip:SetPoint('BOTTOMRIGHT', checkBoxFlying, 'TOPRIGHT', 0, 0);
-		-- GameTooltip:SetText('Add this mount to your personal flying mounts')
-		-- GameTooltip:Show()
-	-- end)
-	-- checkBoxFlying:SetScript('OnLeave', function()
-		-- GameTooltip:Hide()
-	-- end)
-	local checkBoxFlying = createCheckbox('CrazyForMountsCheckBoxFlying', MountJournal.MountDisplay, 'RIGHT', checkBoxGround, 'LEFT', -10, 0, 'Add this mount to your personal flying mounts', 'Interface\\MINIMAP\\TRACKING\\StableMaster')
+	local checkBoxFlying = createCheckbox('CrazyForMountsCheckBoxFlying', MountJournal.MountDisplay, 'RIGHT', checkBoxGround, 'LEFT', -10, 0, 'Add this mount to your personal flying mounts', 'Interface\\MINIMAP\\TRACKING\\FlightMaster')
 	checkBoxFlying:SetScript('OnClick', function(self)
 		local checked = self:GetChecked()
 		PlaySound(checked and SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF)
 		local mountID = MountJournal.selectedMountID
 		updateDB(mountID, true, checked)
 		flyingMountInset.content:SetText(personalMountCount.flying)
-		updateMountList()
+		-- updateMountList()
 	end)
 	
 	hooksecurefunc('MountJournal_UpdateMountDisplay', function()
@@ -280,10 +213,10 @@ local function initAddon()
 		end
 	end)
 	
-	hooksecurefunc('MountJournal_UpdateMountList', updateMountList)
+	-- hooksecurefunc('MountJournal_UpdateMountList', updateMountList)
 	
-	personalMountCount.ground = getLength(personalMountDB.ground)
-	personalMountCount.flying = getLength(personalMountDB.flying)
+	personalMountCount.ground = phis.getLength(personalMountDB.ground)
+	personalMountCount.flying = phis.getLength(personalMountDB.flying)
 end
 
 -- checks if both the addon itself and the Blizzard Collections addon are loaded
@@ -305,13 +238,16 @@ SLASH_CFM2 = '/cfm'
 SlashCmdList['CFM'] = function(msg)
 	if msg:lower() == 'toggle' then
 		locked = not locked
-		print('Setting non-flying mounts as flying mounts is now '..(locked and 'locked' or 'unlocked')..'.')
+		print('|cFF40C7EBCrazy for Mounts:|r Setting non-flying mounts as flying mounts is now '..(locked and 'locked' or 'unlocked')..'.')
+		MountJournal_UpdateMountDisplay()
 	elseif msg:lower() == 'lock' then
 		locked = true
-		print('Setting non-flying mounts as flying mounts is now locked.')
+		print('|cFF40C7EBCrazy for Mounts:|r Setting non-flying mounts as flying mounts is now locked.')
+		MountJournal_UpdateMountDisplay()
 	elseif msg:lower() == 'unlock' then
 		locked = false
-		print('Setting non-flying mounts as flying mounts is now unlocked.')
+		print('|cFF40C7EBCrazy for Mounts:|r Setting non-flying mounts as flying mounts is now unlocked.')
+		MountJournal_UpdateMountDisplay()
 	else
 		summonRandom()
 	end
