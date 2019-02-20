@@ -18,6 +18,10 @@ function phis.getLength(tbl)
 	return length
 end
 
+function phis.print(str)
+	print('|cFF40C7EBCrazy for Mounts:|r '..str)
+end
+
 -- checks whether the player can actually fly
 function phis.IsFlyableArea()
 	-- default WoW check
@@ -91,16 +95,23 @@ end
 --   ADDON FUNCTIONS   --
 -------------------------
 
-local function summonRandom()
+local function summonRandom(mountType)
 	-- if the player is currently mounted - dismount them
 	if IsMounted() then
 		Dismount()
 		return
 	end
 	
-	-- test if the user can fly in the current zone and set the correct list of mounts
-	-- (some areas return wrong value)
-	local canFly = phis.IsFlyableArea()
+	
+	-- if mountType is nil select the appropriate mount table
+	-- else select the table corresponding to the given argument
+	local canFly = false
+	if mountType == nil then
+		canFly = phis.IsFlyableArea()
+	else if mountType == 'flying' then
+		canFly = true
+	end
+	
 	if canFly then
 		tmpCount = personalMountCount.flying
 		tmpMountDB = personalMountDB.flying
@@ -118,7 +129,7 @@ local function summonRandom()
 		local mountID = GetRandomArgument(unpack(tmpIDs))
 		C_MountJournal.SummonByID(mountID)
 	else
-		print('No personal '..(canFly and 'flying' or 'ground')..' mounts set.')
+		phis.print('No personal '..(canFly and 'flying' or 'ground')..' mounts set.')
 	end
 end
 
@@ -174,13 +185,17 @@ local function initAddon()
 	
 	if personalMountCount == nil then
 		personalMountCount = {ground = 0, flying = 0}
+		local playerName, playerRealm = UnitFullName('player')
+		local _, playerClass = UnitClass('player')
+		local _, _, _, classColor = GetClassColor(playerClass)
+		phis.print('Addon loaded for the first time on |c'..classColor..playerName..'|r-'..playerRealm..'.')
 	end
 
 	--- CREATE AND ATTACH FRAMES ---
 	local groundMountInset = createInset('groundMountInset', MountJournal, 100, 20, 'BOTTOMRIGHT', -7, 5, 'Ground: ', personalMountCount.ground)
 	local flyingMountInset = createInset('flyingMountInset', groundMountInset, 100, 20, 'LEFT', -110, 0, 'Flying: ', personalMountCount.flying)
 	
-	local checkBoxGround = createCheckbox('CrazyForMountsCheckBoxGround', MountJournal.MountDisplay, 'TOPRIGHT', MountJournal.MountDisplay, 'BOTTOMRIGHT', -10, 50, 'Add this mount to your personal ground mounts', 'Interface\\MINIMAP\\TRACKING\\StableMaster')
+	local checkBoxGround = createCheckbox('CrazyForMountsCheckBoxGround', MountJournal.MountDisplay, 'TOPRIGHT', MountJournal.MountDisplay, 'BOTTOMRIGHT', -10, 50, 'Add this mount to your personal ground mounts', 'Interface\\Addons\\CrazyForMount\\Icons\\horse.tga')
 	checkBoxGround:SetScript('OnClick', function(self)
 		local checked = self:GetChecked()
 		PlaySound(checked and SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF)
@@ -190,7 +205,7 @@ local function initAddon()
 		-- updateMountList()
 	end)
 	
-	local checkBoxFlying = createCheckbox('CrazyForMountsCheckBoxFlying', MountJournal.MountDisplay, 'RIGHT', checkBoxGround, 'LEFT', -10, 0, 'Add this mount to your personal flying mounts', 'Interface\\MINIMAP\\TRACKING\\FlightMaster')
+	local checkBoxFlying = createCheckbox('CrazyForMountsCheckBoxFlying', MountJournal.MountDisplay, 'RIGHT', checkBoxGround, 'LEFT', -10, 0, 'Add this mount to your personal flying mounts', 'Interface\\Addons\\CrazyForMount\\Icons\\bird.tga')
 	checkBoxFlying:SetScript('OnClick', function(self)
 		local checked = self:GetChecked()
 		PlaySound(checked and SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF)
@@ -232,22 +247,71 @@ local function checkInit(self, event, addon)
 	end
 end
 
+-------------------------
+--   DEBUG FUNCTIONS   --
+-------------------------
+local function copyFromOldVersion(tbl)
+	local numCopiedMounts = 0
+	
+	-- generate tables where mount names are keys
+	local tmpFlying = {}
+	local tmpGround = {}
+	for k,v in pairs(tbl[1]) do
+		tmpFlying[v] = true
+	end
+	for k,v in pairs(tbl[2]) do
+		tmpGround[v] = true
+	end
+	
+	mountIDTable = C_MountJournal.GetMountIDs()
+	
+	for mount in pairs(mountIDTable) do
+		mountName = C_MountJournal.GetMountInfoByID(mount)
+		if tmpFlying[mountName] then
+			updateDB(mount, true, true)
+		end
+		if tmpGround[mountName] then
+			updateDB(mount, false, true)
+		end
+		numCopiedMounts = numCopiedMounts + 1
+	end
+
+	phis.print(numCopiedMounts..' copied from old table.')
+end
+
+-------------------------
+--    SLASH COMMANDS   --
+-------------------------
+
 SLASH_CFM1 = '/crazyformounts'
 SLASH_CFM2 = '/cfm'
 
 SlashCmdList['CFM'] = function(msg)
-	if msg:lower() == 'toggle' then
+	local arg1, arg2 = strsplit(' ', msg)
+	if arg1:lower() == 'toggle' then
 		locked = not locked
-		print('|cFF40C7EBCrazy for Mounts:|r Setting non-flying mounts as flying mounts is now '..(locked and 'locked' or 'unlocked')..'.')
+		phis.print('Setting non-flying mounts as flying mounts is now '..(locked and 'locked' or 'unlocked')..'.')
 		MountJournal_UpdateMountDisplay()
-	elseif msg:lower() == 'lock' then
+	elseif arg1:lower() == 'lock' then
 		locked = true
-		print('|cFF40C7EBCrazy for Mounts:|r Setting non-flying mounts as flying mounts is now locked.')
+		phis.print('Setting non-flying mounts as flying mounts is now locked.')
 		MountJournal_UpdateMountDisplay()
-	elseif msg:lower() == 'unlock' then
+	elseif arg1:lower() == 'unlock' then
 		locked = false
-		print('|cFF40C7EBCrazy for Mounts:|r Setting non-flying mounts as flying mounts is now unlocked.')
+		phis.print('Setting non-flying mounts as flying mounts is now unlocked.')
 		MountJournal_UpdateMountDisplay()
+	elseif arg1:lower() == 'flying' then
+		summonRandom('flying')
+	elseif arg1:lower() == 'ground' then
+		summonRandom('ground')	
+	-- DEBUG
+	elseif arg1:lower() == 'copy' then
+		if mount_tables and mount_tables[arg2:lower()] then
+			copyFromOldVersion(mount_tables[arg2:lower()])
+		else
+			phis.print('Table "'..arg2..'" is nil.')
+		end
+	-- DEBUG END
 	else
 		summonRandom()
 	end
