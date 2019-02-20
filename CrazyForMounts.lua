@@ -71,6 +71,9 @@ local function createCheckbox(name, parent, anchor, relativeFrame, relativePoint
 	local newCheckbox = CreateFrame('CheckButton', name, parent, 'UICheckButtonTemplate')
 	newCheckbox:SetPoint(anchor, relativeFrame, relativePoint, ofsX, ofsY)
 	
+	newCheckbox:SetHeight(38)
+	newCheckbox:SetWidth(38)
+	
 	newCheckbox:SetScript('OnEnter', function()
 		GameTooltip_SetDefaultAnchor(GameTooltip, UIParent)
 		GameTooltip:SetPoint('BOTTOMRIGHT', newCheckbox, 'TOPRIGHT', 0, 0);
@@ -83,8 +86,8 @@ local function createCheckbox(name, parent, anchor, relativeFrame, relativePoint
 	end)
 	
 	newCheckbox.background = newCheckbox:CreateTexture(nil, 'BACKGROUND')
-	newCheckbox.background:SetWidth(20)
-	newCheckbox.background:SetHeight(20)
+	newCheckbox.background:SetWidth(24)
+	newCheckbox.background:SetHeight(24)
 	newCheckbox.background:SetTexture(bgPath)
 	newCheckbox.background:SetPoint('CENTER',newCheckbox)
 
@@ -96,6 +99,12 @@ end
 -------------------------
 
 local function summonRandom(mountType)
+	-- if addon not initialized
+	if personalMountCount == nil or personalMountDB == nil then
+		phis.print('Addon not yet initialized. Open the mount journal...')
+		return
+	end
+
 	-- if the player is currently mounted - dismount them
 	if IsMounted() then
 		Dismount()
@@ -108,16 +117,16 @@ local function summonRandom(mountType)
 	local canFly = false
 	if mountType == nil then
 		canFly = phis.IsFlyableArea()
-	else if mountType == 'flying' then
+	elseif mountType == 'flying' then
 		canFly = true
 	end
 	
 	if canFly then
-		tmpCount = personalMountCount.flying
-		tmpMountDB = personalMountDB.flying
+		tmpCount = (personalMountCount.flying or 0)
+		tmpMountDB = (personalMountDB.flying or {})
 	else
-		tmpCount = personalMountCount.ground
-		tmpMountDB = personalMountDB.ground
+		tmpCount = (personalMountCount.ground or 0)
+		tmpMountDB = (personalMountDB.ground or {})
 	end
 	
 	-- add all mounts from the chosen table to an (ordinary) array to make unpack() work
@@ -145,42 +154,6 @@ local function updateDB(mountID, flyable, addMount)
 	end
 end
 
--- -- attaches icons to every mount in personalMountDB
--- local function updateMountList()
-	-- local scrollFrame = MountJournal.ListScrollFrame
-	-- local buttons = scrollFrame.buttons
-	-- local offset = HybridScrollFrame_GetOffset(scrollFrame)
-	-- local numMounts = C_MountJournal.GetNumDisplayedMounts()
-	
-	-- for i=1, #buttons do
-		-- button = buttons[i]
-		
-		-- button.personalFavoriteGround = button:CreateTexture(nil, 'OVERLAY')
-		-- button.personalFavoriteGround:Hide()
-		-- button.personalFavoriteGround:SetTexture('Interface\\MINIMAP\\TRACKING\\StableMaster')
-		-- button.personalFavoriteGround:SetSize(22,22)
-		-- button.personalFavoriteGround:SetPoint('CENTER', button, 'TOPRIGHT', -12, -12)
-		
-		-- displayIndex = i + offset
-		-- if displayIndex <= numMounts and numMounts > 0 then
-			-- _, _, _, _, _, _, _, _, _, _, _, mountID = C_MountJournal.GetDisplayedMountInfo(displayIndex)
-			-- if personalMountDB.ground[mountID] then
-				-- button.personalFavoriteGround:Show()
-			-- else
-				-- button.personalFavoriteGround:Hide()
-			-- end
-			-- if personalMountDB.flying[mountID] then
-				-- 
-			-- end
-		-- else
-			-- button.personalFavoriteGround:Hide()
-		-- end
-	-- end
-	-- local MOUNT_BUTTON_HEIGHT = 46
-	-- local totalHeight = numMounts * MOUNT_BUTTON_HEIGHT
-	-- HybridScrollFrame_Update(scrollFrame, totalHeight, scrollFrame:GetHeight())
--- end
-
 local function initAddon()
 	--- SETUP VARIABLES ---
 	
@@ -200,24 +173,22 @@ local function initAddon()
 	local groundMountInset = createInset('groundMountInset', MountJournal, 100, 20, 'BOTTOMRIGHT', -7, 5, 'Ground: ', personalMountCount.ground)
 	local flyingMountInset = createInset('flyingMountInset', groundMountInset, 100, 20, 'LEFT', -110, 0, 'Flying: ', personalMountCount.flying)
 	
-	local checkBoxGround = createCheckbox('CrazyForMountsCheckBoxGround', MountJournal.MountDisplay, 'TOPRIGHT', MountJournal.MountDisplay, 'BOTTOMRIGHT', -10, 50, 'Add this mount to your personal ground mounts', 'Interface\\Addons\\CrazyForMount\\Icons\\horse.tga')
+	local checkBoxGround = createCheckbox('CrazyForMountsCheckBoxGround', MountJournal.MountDisplay, 'TOPRIGHT', MountJournal.MountDisplay, 'BOTTOMRIGHT', -10, 52, 'Add this mount to your personal ground mounts', 'Interface\\Addons\\CrazyForMounts\\Icons\\horse')
 	checkBoxGround:SetScript('OnClick', function(self)
 		local checked = self:GetChecked()
 		PlaySound(checked and SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF)
 		local mountID = MountJournal.selectedMountID
 		updateDB(mountID, false, checked)
 		groundMountInset.content:SetText(personalMountCount.ground)
-		-- updateMountList()
 	end)
 	
-	local checkBoxFlying = createCheckbox('CrazyForMountsCheckBoxFlying', MountJournal.MountDisplay, 'RIGHT', checkBoxGround, 'LEFT', -10, 0, 'Add this mount to your personal flying mounts', 'Interface\\Addons\\CrazyForMount\\Icons\\bird.tga')
+	local checkBoxFlying = createCheckbox('CrazyForMountsCheckBoxFlying', MountJournal.MountDisplay, 'RIGHT', checkBoxGround, 'LEFT', -10, 0, 'Add this mount to your personal flying mounts', 'Interface\\Addons\\CrazyForMounts\\Icons\\bird')
 	checkBoxFlying:SetScript('OnClick', function(self)
 		local checked = self:GetChecked()
 		PlaySound(checked and SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF)
 		local mountID = MountJournal.selectedMountID
 		updateDB(mountID, true, checked)
 		flyingMountInset.content:SetText(personalMountCount.flying)
-		-- updateMountList()
 	end)
 	
 	hooksecurefunc('MountJournal_UpdateMountDisplay', function()
@@ -232,8 +203,6 @@ local function initAddon()
 			checkBoxFlying:Disable()
 		end
 	end)
-	
-	-- hooksecurefunc('MountJournal_UpdateMountList', updateMountList)
 	
 	personalMountCount.ground = phis.getLength(personalMountDB.ground)
 	personalMountCount.flying = phis.getLength(personalMountDB.flying)
@@ -308,15 +277,7 @@ SlashCmdList['CFM'] = function(msg)
 	elseif arg1:lower() == 'flying' then
 		summonRandom('flying')
 	elseif arg1:lower() == 'ground' then
-		summonRandom('ground')	
-	-- DEBUG
-	elseif arg1:lower() == 'copy' then
-		if mount_tables and mount_tables[arg2:lower()] then
-			copyFromOldVersion(mount_tables[arg2:lower()])
-		else
-			phis.print('Table "'..arg2..'" is nil.')
-		end
-	-- DEBUG END
+		summonRandom('ground')
 	else
 		summonRandom()
 	end
