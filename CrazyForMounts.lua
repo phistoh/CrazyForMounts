@@ -154,6 +154,41 @@ local function updateDB(mountID, flyable, addMount)
 	end
 end
 
+-- attaches icons to personal favorites
+hooksecurefunc('MountJournal_UpdateMountList', function()
+	local scrollFrame = MountJournal.ListScrollFrame
+	local buttons = scrollFrame.buttons
+	local offset = HybridScrollFrame_GetOffset(scrollFrame)
+	local numMounts = C_MountJournal.GetNumDisplayedMounts()
+	
+	for i=1, #buttons do
+		button = buttons[i]
+		
+		button.personalFavoriteGround = button:CreateTexture(nil, 'OVERLAY')
+		button.personalFavoriteGround:Hide()
+		button.personalFavoriteGround:SetTexture('Interface\\Addons\\CrazyForMounts\\Icons\\horse')
+		button.personalFavoriteGround:SetPoint('CENTER', button, 'TOPRIGHT', 8, 8)
+		
+		button.personalFavoriteFlying = button:CreateTexture(nil, 'OVERLAY')
+		button.personalFavoriteFlying:Hide()
+		button.personalFavoriteFlying:SetTexture('Interface\\Addons\\CrazyForMounts\\Icons\\bird')
+		button.personalFavoriteFlying:SetPoint('CENTER', button, 'BOTTOMRIGHT', 8, -8)
+		
+		displayIndex = i + offset
+		if displayIndex <= numMounts and numMounts > 0 then
+			creatureName, _, _, _, _, _, _, _, _, _, _, mountID = C_MountJournal.GetDisplayedMountInfo(displayIndex)
+			if personalMountDB.ground[mountID] then
+				button.personalFavoriteGround:Show()
+			end
+			if personalMountDB.flying[mountID] then
+				button.personalFavoriteFlying:Show()
+			end
+		end
+	end
+	
+	scrollFrame.update = function() return MountJournal_UpdateMountList() end
+end)
+
 local function initAddon()
 	--- SETUP VARIABLES ---
 	
