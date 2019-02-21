@@ -25,7 +25,7 @@ function phis.getLength(tbl)
 end
 
 function phis.print(str)
-	print('|cFF40C7EBCrazy for Mounts:|r '..str)
+	print('|cFF40C7EB'..addonName..':|r '..str)
 end
 
 -- checks whether the player can actually fly
