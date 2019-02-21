@@ -1,0 +1,11 @@
+<Bindings>
+	<Binding name="Summon random mount" header="addonName" category="ADDONS">
+		summonRandom()
+	</Binding>
+	<Binding name="Summon random flying mount" header="addonName" category="ADDONS">
+		summonRandom('flying')
+	</Binding>
+	<Binding name="Summon random ground mount" header="addonName" category="ADDONS">
+		summonRandom('ground')
+	</Binding>
+</Bindings>

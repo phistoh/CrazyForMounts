@@ -222,38 +222,6 @@ local function checkInit(self, event, addon)
 end
 
 -------------------------
---   DEBUG FUNCTIONS   --
--------------------------
-local function copyFromOldVersion(tbl)
-	local numCopiedMounts = 0
-	
-	-- generate tables where mount names are keys
-	local tmpFlying = {}
-	local tmpGround = {}
-	for k,v in pairs(tbl[1]) do
-		tmpFlying[v] = true
-	end
-	for k,v in pairs(tbl[2]) do
-		tmpGround[v] = true
-	end
-	
-	mountIDTable = C_MountJournal.GetMountIDs()
-	
-	for mount in pairs(mountIDTable) do
-		mountName = C_MountJournal.GetMountInfoByID(mount)
-		if tmpFlying[mountName] then
-			updateDB(mount, true, true)
-		end
-		if tmpGround[mountName] then
-			updateDB(mount, false, true)
-		end
-		numCopiedMounts = numCopiedMounts + 1
-	end
-
-	phis.print(numCopiedMounts..' copied from old table.')
-end
-
--------------------------
 --    SLASH COMMANDS   --
 -------------------------
 
