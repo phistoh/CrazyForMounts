@@ -1,11 +1,11 @@
 <Bindings>
-	<Binding name="Summon random mount" header="addonName" category="ADDONS">
-		summonRandom()
+	<Binding name="CRAZYFORMOUNTS_SUMMON_RANDOM" header="CRAZYFORMOUNTS" category="ADDONS">
+		phis.summonRandom();
 	</Binding>
-	<Binding name="Summon random flying mount" header="addonName" category="ADDONS">
-		summonRandom('flying')
+	<Binding name="CRAZYFORMOUNTS_SUMMON_FLYING" category="ADDONS">
+		phis.summonRandom('flying');
 	</Binding>
-	<Binding name="Summon random ground mount" header="addonName" category="ADDONS">
-		summonRandom('ground')
+	<Binding name="CRAZYFORMOUNTS_SUMMON_GROUND" category="ADDONS">
+		phis.summonRandom('ground');
 	</Binding>
 </Bindings>

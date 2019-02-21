@@ -1,10 +1,16 @@
-local addonName, phis = ...
+addonName, phis = ...
 
 local phisFrame = CreateFrame('Frame', 'phisCheckFrame', UIParent)
 phisFrame:RegisterEvent('ADDON_LOADED')
 
 -- controls whether non-flying mounts can be added to the table of flying mounts
 local locked = true
+
+-- key binding globals
+BINDING_HEADER_CRAZYFORMOUNTS = addonName
+BINDING_NAME_CRAZYFORMOUNTS_SUMMON_RANDOM = "Summon random mount"
+BINDING_NAME_CRAZYFORMOUNTS_SUMMON_FLYING = "Summon random flying mount"
+BINDING_NAME_CRAZYFORMOUNTS_SUMMON_GROUND = "Summon random ground mount"
 
 -------------------------
 --   AUXILIARY STUFF   --
@@ -97,8 +103,8 @@ end
 -------------------------
 --   ADDON FUNCTIONS   --
 -------------------------
-
-local function summonRandom(mountType)
+-- global because it gets used by keybinds
+function phis.summonRandom(mountType)
 	-- if addon not initialized
 	if personalMountCount == nil or personalMountDB == nil then
 		phis.print('Addon not yet initialized. Open the mount journal...')
@@ -153,41 +159,6 @@ local function updateDB(mountID, flyable, addMount)
 		personalMountCount[mountType] = math.max(personalMountCount[mountType] - 1, 0)
 	end
 end
-
--- attaches icons to personal favorites
-hooksecurefunc('MountJournal_UpdateMountList', function()
-	local scrollFrame = MountJournal.ListScrollFrame
-	local buttons = scrollFrame.buttons
-	local offset = HybridScrollFrame_GetOffset(scrollFrame)
-	local numMounts = C_MountJournal.GetNumDisplayedMounts()
-	
-	for i=1, #buttons do
-		button = buttons[i]
-		
-		button.personalFavoriteGround = button:CreateTexture(nil, 'OVERLAY')
-		button.personalFavoriteGround:Hide()
-		button.personalFavoriteGround:SetTexture('Interface\\Addons\\CrazyForMounts\\Icons\\horse')
-		button.personalFavoriteGround:SetPoint('CENTER', button, 'TOPRIGHT', 8, 8)
-		
-		button.personalFavoriteFlying = button:CreateTexture(nil, 'OVERLAY')
-		button.personalFavoriteFlying:Hide()
-		button.personalFavoriteFlying:SetTexture('Interface\\Addons\\CrazyForMounts\\Icons\\bird')
-		button.personalFavoriteFlying:SetPoint('CENTER', button, 'BOTTOMRIGHT', 8, -8)
-		
-		displayIndex = i + offset
-		if displayIndex <= numMounts and numMounts > 0 then
-			creatureName, _, _, _, _, _, _, _, _, _, _, mountID = C_MountJournal.GetDisplayedMountInfo(displayIndex)
-			if personalMountDB.ground[mountID] then
-				button.personalFavoriteGround:Show()
-			end
-			if personalMountDB.flying[mountID] then
-				button.personalFavoriteFlying:Show()
-			end
-		end
-	end
-	
-	scrollFrame.update = function() return MountJournal_UpdateMountList() end
-end)
 
 local function initAddon()
 	--- SETUP VARIABLES ---
@@ -278,11 +249,11 @@ SlashCmdList['CFM'] = function(msg)
 		phis.print('Setting non-flying mounts as flying mounts is now unlocked.')
 		MountJournal_UpdateMountDisplay()
 	elseif arg1:lower() == 'flying' then
-		summonRandom('flying')
+		phis.summonRandom('flying')
 	elseif arg1:lower() == 'ground' then
-		summonRandom('ground')
+		phis.summonRandom('ground')
 	else
-		summonRandom()
+		phis.summonRandom()
 	end
 end
 
