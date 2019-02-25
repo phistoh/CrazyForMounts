@@ -1,4 +1,4 @@
-addonName, phis = ...
+local addonName, phis = ...
 
 local phisFrame = CreateFrame('Frame', 'phisCheckFrame', UIParent)
 phisFrame:RegisterEvent('ADDON_LOADED')
@@ -11,12 +11,13 @@ BINDING_HEADER_CRAZYFORMOUNTS = addonName
 BINDING_NAME_CRAZYFORMOUNTS_SUMMON_RANDOM = "Summon random mount"
 BINDING_NAME_CRAZYFORMOUNTS_SUMMON_FLYING = "Summon random flying mount"
 BINDING_NAME_CRAZYFORMOUNTS_SUMMON_GROUND = "Summon random ground mount"
+CrazyForMountsGlobals = {}
 
 -------------------------
 --   AUXILIARY STUFF   --
 -------------------------
 
-function phis.getLength(tbl)
+local function getLength(tbl)
 	length = 0
 	for k,v in pairs(tbl) do
 		length = length + 1
@@ -24,7 +25,7 @@ function phis.getLength(tbl)
 	return length
 end
 
-function phis.print(str)
+local function addonPrint(str)
 	print('|cFF40C7EB'..addonName..':|r '..str)
 end
 
@@ -104,10 +105,10 @@ end
 --   ADDON FUNCTIONS   --
 -------------------------
 -- global because it gets used by keybinds
-function phis.summonRandom(mountType)
+local function summonRandom(mountType)
 	-- if addon not initialized
 	if personalMountCount == nil or personalMountDB == nil then
-		phis.print('Addon not yet initialized. Open the mount journal...')
+		addonPrint('Addon not yet initialized. Open the mount journal...')
 		return
 	end
 
@@ -144,9 +145,11 @@ function phis.summonRandom(mountType)
 		local mountID = GetRandomArgument(unpack(tmpIDs))
 		C_MountJournal.SummonByID(mountID)
 	else
-		phis.print('No personal '..(canFly and 'flying' or 'ground')..' mounts set.')
+		addonPrint('No personal '..(canFly and 'flying' or 'ground')..' mounts set.')
 	end
 end
+-- add to globals for keybindings
+CrazyForMountsGlobals.summonRandom = summonRandom
 
 -- mountIDs are used as keys for more efficient lookup
 local function updateDB(mountID, flyable, addMount)
@@ -172,7 +175,7 @@ local function initAddon()
 		local playerName, playerRealm = UnitFullName('player')
 		local _, playerClass = UnitClass('player')
 		local _, _, _, classColor = GetClassColor(playerClass)
-		phis.print('Addon loaded for the first time on |c'..classColor..playerName..'|r-'..playerRealm..'.')
+		addonPrint('Addon loaded for the first time on |c'..classColor..playerName..'|r-'..playerRealm..'.')
 	end
 
 	--- CREATE AND ATTACH FRAMES ---
@@ -210,8 +213,8 @@ local function initAddon()
 		end
 	end)
 	
-	personalMountCount.ground = phis.getLength(personalMountDB.ground)
-	personalMountCount.flying = phis.getLength(personalMountDB.flying)
+	personalMountCount.ground = getLength(personalMountDB.ground)
+	personalMountCount.flying = getLength(personalMountDB.flying)
 end
 
 -- checks if both the addon itself and the Blizzard Collections addon are loaded
@@ -238,22 +241,22 @@ SlashCmdList['CFM'] = function(msg)
 	local arg1, arg2 = strsplit(' ', msg)
 	if arg1:lower() == 'toggle' then
 		locked = not locked
-		phis.print('Setting non-flying mounts as flying mounts is now '..(locked and 'locked' or 'unlocked')..'.')
+		addonPrint('Setting non-flying mounts as flying mounts is now '..(locked and 'locked' or 'unlocked')..'.')
 		MountJournal_UpdateMountDisplay()
 	elseif arg1:lower() == 'lock' then
 		locked = true
-		phis.print('Setting non-flying mounts as flying mounts is now locked.')
+		addonPrint('Setting non-flying mounts as flying mounts is now locked.')
 		MountJournal_UpdateMountDisplay()
 	elseif arg1:lower() == 'unlock' then
 		locked = false
-		phis.print('Setting non-flying mounts as flying mounts is now unlocked.')
+		addonPrint('Setting non-flying mounts as flying mounts is now unlocked.')
 		MountJournal_UpdateMountDisplay()
 	elseif arg1:lower() == 'flying' then
-		phis.summonRandom('flying')
+		summonRandom('flying')
 	elseif arg1:lower() == 'ground' then
-		phis.summonRandom('ground')
+		summonRandom('ground')
 	else
-		phis.summonRandom()
+		summonRandom()
 	end
 end
 

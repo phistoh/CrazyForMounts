@@ -1,11 +1,11 @@
 <Bindings>
 	<Binding name="CRAZYFORMOUNTS_SUMMON_RANDOM" header="CRAZYFORMOUNTS" category="ADDONS">
-		phis.summonRandom();
+		CrazyForMountsGlobals.summonRandom();
 	</Binding>
 	<Binding name="CRAZYFORMOUNTS_SUMMON_FLYING" category="ADDONS">
-		phis.summonRandom('flying');
+		CrazyForMountsGlobals.summonRandom('flying');
 	</Binding>
 	<Binding name="CRAZYFORMOUNTS_SUMMON_GROUND" category="ADDONS">
-		phis.summonRandom('ground');
+		CrazyForMountsGlobals.summonRandom('ground');
 	</Binding>
 </Bindings>
