@@ -17,6 +17,6 @@ Select both ground and flying mounts via checkbox in the mount journal from whic
 - **1.0**: Initial release
 
 ## To-Do
-- [ ] Mark selected pets in the scroll list
+- [ ] Mark selected mounts in the scroll list
 - [x] Implement the generation of (mount name, mount id) table (using saved vars?)
 - [x] Don't use a table of tables, use the "inner" tables directly instead
