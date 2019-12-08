@@ -116,8 +116,7 @@ local function summonRandom(mountType)
 	if IsMounted() then
 		Dismount()
 		return
-	end
-	
+	end	
 	
 	-- if mountType is nil select the appropriate mount table
 	-- else select the table corresponding to the given argument
@@ -182,7 +181,7 @@ local function initAddon()
 	local groundMountInset = createInset('groundMountInset', MountJournal, 100, 20, 'BOTTOMRIGHT', -7, 5, 'Ground: ', personalMountCount.ground)
 	local flyingMountInset = createInset('flyingMountInset', groundMountInset, 100, 20, 'LEFT', -110, 0, 'Flying: ', personalMountCount.flying)
 	
-	local checkBoxGround = createCheckbox('CrazyForMountsCheckBoxGround', MountJournal.MountDisplay, 'TOPRIGHT', MountJournal.MountDisplay, 'BOTTOMRIGHT', -10, 52, 'Add this mount to your personal ground mounts', 'Interface\\Addons\\CrazyForMounts\\Icons\\horse')
+	local checkBoxGround = createCheckbox('CrazyForMountsCheckBoxGround', MountJournal.MountDisplay, 'TOPLEFT', MountJournal.MountDisplay, 'BOTTOMLEFT', 10, 52, 'Add this mount to your personal ground mounts', 'Interface\\Addons\\CrazyForMounts\\Icons\\horse')
 	checkBoxGround:SetScript('OnClick', function(self)
 		local checked = self:GetChecked()
 		PlaySound(checked and SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF)
@@ -191,7 +190,7 @@ local function initAddon()
 		groundMountInset.content:SetText(personalMountCount.ground)
 	end)
 	
-	local checkBoxFlying = createCheckbox('CrazyForMountsCheckBoxFlying', MountJournal.MountDisplay, 'RIGHT', checkBoxGround, 'LEFT', -10, 0, 'Add this mount to your personal flying mounts', 'Interface\\Addons\\CrazyForMounts\\Icons\\bird')
+	local checkBoxFlying = createCheckbox('CrazyForMountsCheckBoxFlying', MountJournal.MountDisplay, 'LEFT', checkBoxGround, 'RIGHT', 10, 0, 'Add this mount to your personal flying mounts', 'Interface\\Addons\\CrazyForMounts\\Icons\\bird')
 	checkBoxFlying:SetScript('OnClick', function(self)
 		local checked = self:GetChecked()
 		PlaySound(checked and SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF)
