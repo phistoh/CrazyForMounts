@@ -6,6 +6,9 @@ phisFrame:RegisterEvent('ADDON_LOADED')
 -- controls whether non-flying mounts can be added to the table of flying mounts
 local locked = true
 
+-- controls the icons to indicate persopnal favorites
+local personalFavoriteIcons = nil
+
 -- key binding globals
 BINDING_HEADER_CRAZYFORMOUNTS = addonName
 BINDING_NAME_CRAZYFORMOUNTS_SUMMON_RANDOM = "Summon random mount"
@@ -92,7 +95,7 @@ local function createCheckbox(name, parent, anchor, relativeFrame, relativePoint
 		GameTooltip:Hide()
 	end)
 	
-	newCheckbox.background = newCheckbox:CreateTexture(nil, 'BACKGROUND')
+	newCheckbox.background = newCheckbox:CreateTexture(name..'Texture', 'BACKGROUND')
 	newCheckbox.background:SetWidth(24)
 	newCheckbox.background:SetHeight(24)
 	newCheckbox.background:SetTexture(bgPath)
@@ -101,10 +104,44 @@ local function createCheckbox(name, parent, anchor, relativeFrame, relativePoint
 	return newCheckbox
 end
 
+local function createPersonalFavoriteIcon(name, parent)
+	personalFavoriteIcon = parent:CreateTexture(name, 'HIGH')
+	personalFavoriteIcon:SetAtlas('PetJournal-FavoritesIcon', true)
+	personalFavoriteIcon:SetPoint('RIGHT', parent, 'RIGHT', -2, 0)
+	personalFavoriteIcon:SetDesaturated(true)
+	personalFavoriteIcon:SetVertexColor(0.250, 0.780, 0.921)
+
+	return personalFavoriteIcon
+end
+
 -------------------------
 --   ADDON FUNCTIONS   --
 -------------------------
--- global because it gets used by keybinds
+-- updates the list to star icons in the scroll frame on personal favorites
+local function updateList()
+	if MountJournal:IsVisible() then
+		
+		if personalFavoriteIcons == nil or getLength(personalFavoriteIcons) ~= #MountJournal.ListScrollFrame.buttons then
+			personalFavoriteIcons = {}
+			for i=1,#MountJournal.ListScrollFrame.buttons do
+				personalFavoriteIcons[i] = createPersonalFavoriteIcon('MountJournalListScrollFrameButton'..i..'.personalFavoriteIcon', _G["MountJournalListScrollFrameButton"..i])
+				personalFavoriteIcons[i]:Hide()
+			end
+		end
+		
+		local offset = HybridScrollFrame_GetOffset(MountJournal.ListScrollFrame)
+		for i=1,#MountJournal.ListScrollFrame.buttons do
+			button = _G["MountJournalListScrollFrameButton"..i]
+			_, _, _, _, _, _, _, _, _, _, _, mountID = C_MountJournal.GetDisplayedMountInfo(i + offset)
+			if personalMountDB['ground'][mountID] ~= nil or personalMountDB['flying'][mountID] ~= nil then
+				personalFavoriteIcons[i]:Show()
+			else
+				personalFavoriteIcons[i]:Hide()
+			end
+		end
+	end
+end
+
 local function summonRandom(mountType)
 	-- if addon not initialized
 	if personalMountCount == nil or personalMountDB == nil then
@@ -187,6 +224,7 @@ local function initAddon()
 		PlaySound(checked and SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF)
 		local mountID = MountJournal.selectedMountID
 		updateDB(mountID, false, checked)
+		updateList()
 		groundMountInset.content:SetText(personalMountCount.ground)
 	end)
 	
@@ -196,6 +234,7 @@ local function initAddon()
 		PlaySound(checked and SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF)
 		local mountID = MountJournal.selectedMountID
 		updateDB(mountID, true, checked)
+		updateList()
 		flyingMountInset.content:SetText(personalMountCount.flying)
 	end)
 	
@@ -211,6 +250,9 @@ local function initAddon()
 			checkBoxFlying:Disable()
 		end
 	end)
+	
+	hooksecurefunc("MountJournal_UpdateMountList",updateList)
+	MountJournalListScrollFrameScrollBar:HookScript("OnValueChanged",updateList)
 	
 	personalMountCount.ground = getLength(personalMountDB.ground)
 	personalMountCount.flying = getLength(personalMountDB.flying)
