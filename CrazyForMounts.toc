@@ -1,6 +1,6 @@
-## Interface: 80100
+## Interface: 80300
 ## Title: CrazyForMounts
-## Version: 2.0b
+## Version: 2.1
 ## Author: phistoh
 ## Notes: Provides a command to summon a random mount from a predefined table.
 ## SavedVariablesPerCharacter: personalMountDB, personalMountCount
