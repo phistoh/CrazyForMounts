@@ -37,8 +37,8 @@ function phis.IsFlyableArea()
 	-- default WoW check
 	if not IsFlyableArea() then
 		return false
-	-- flying requires Level 60
-	elseif UnitLevel("player") < 60 then
+	-- flying requires Level 30
+	elseif UnitLevel("player") < 30 then
 		return false
 	end
 	
@@ -131,7 +131,6 @@ local function updateList()
 		
 		local offset = HybridScrollFrame_GetOffset(MountJournal.ListScrollFrame)
 		for i=1,#MountJournal.ListScrollFrame.buttons do
-			button = _G["MountJournalListScrollFrameButton"..i]
 			_, _, _, _, _, _, _, _, _, _, _, mountID = C_MountJournal.GetDisplayedMountInfo(i + offset)
 			if personalMountDB['ground'][mountID] ~= nil or personalMountDB['flying'][mountID] ~= nil then
 				personalFavoriteIcons[i]:Show()
@@ -283,15 +282,21 @@ SlashCmdList['CFM'] = function(msg)
 	if arg1:lower() == 'toggle' then
 		locked = not locked
 		addonPrint('Setting non-flying mounts as flying mounts is now '..(locked and 'locked' or 'unlocked')..'.')
-		MountJournal_UpdateMountDisplay()
+		if MountJournal then
+			MountJournal_UpdateMountDisplay(true)
+		end
 	elseif arg1:lower() == 'lock' then
 		locked = true
 		addonPrint('Setting non-flying mounts as flying mounts is now locked.')
-		MountJournal_UpdateMountDisplay()
+		if MountJournal then
+			MountJournal_UpdateMountDisplay(true)
+		end
 	elseif arg1:lower() == 'unlock' then
 		locked = false
 		addonPrint('Setting non-flying mounts as flying mounts is now unlocked.')
-		MountJournal_UpdateMountDisplay()
+		if MountJournal then
+			MountJournal_UpdateMountDisplay(true)
+		end
 	elseif arg1:lower() == 'flying' then
 		summonRandom('flying')
 	elseif arg1:lower() == 'ground' then
