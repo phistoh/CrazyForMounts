@@ -177,7 +177,7 @@ local function summonRandom(mountType)
 		for k in pairs(tmpMountDB) do
 			table.insert(tmpIDs, k)
 		end
-		local mountID = GetRandomArgument(unpack(tmpIDs))
+		local mountID = tmpIDs[math.random(#tmpIDs)]
 		C_MountJournal.SummonByID(mountID)
 	else
 		addonPrint('No personal '..(canFly and 'flying' or 'ground')..' mounts set.')
