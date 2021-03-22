@@ -4,11 +4,6 @@ on:
   push:
     tags:
       - '*'
-  # workflow_dispatch:
-    # inputs:
-      # version:
-        # description: 'Addon version'
-        # required: true
 
 jobs:
   package:
@@ -50,8 +45,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{steps.init.outputs.tag_name}}
-        release_name: ${{steps.init.outputs.addon_name}} ${{github.event.inputs.version}}
-        body: ${{steps.init.outputs.addon_name}} ${{github.event.inputs.version}}
+        release_name: ${{steps.init.outputs.addon_name}} ${{ steps.get_version.outputs.VERSION }}
+        body: ${{steps.init.outputs.addon_name}} ${{ steps.get_version.outputs.VERSION }}
         draft: false
         prerelease: false
 
