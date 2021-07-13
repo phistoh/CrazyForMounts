@@ -11,6 +11,7 @@ Select both ground and flying mounts via checkbox in the mount journal from whic
 - **horse.tga** and **bird.tga** are used as backgrounds for the checkboxes
 
 ## Changes
+- **2.1.2**: Update for Chains of Domination (9.1.0) (new interface number)
 - **2.1.1**: Update for Shadowlands (9.0.5) (new interface number)
 - **2.1**: Mounts in mount journal scroll list now show icons if they're marked as personal favorites
 - **2.0b**: Table of mounts is now generated ingame (checkboxes in the mount journal) and saved per character (using WoW's saved variables)
