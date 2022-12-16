@@ -1,11 +1,11 @@
 <Bindings>
-	<Binding name="CRAZYFORMOUNTS_SUMMON_RANDOM" category="BINDING_HEADER_CRAZYFORMOUNTS">
+	<Binding name="CRAZYFORMOUNTS_SUMMON_RANDOM" category="ADDONS">
 		CrazyForMountsGlobals.summonRandom();
 	</Binding>
-	<Binding name="CRAZYFORMOUNTS_SUMMON_FLYING" category="BINDING_HEADER_CRAZYFORMOUNTS">
+	<Binding name="CRAZYFORMOUNTS_SUMMON_FLYING" category="ADDONS">
 		CrazyForMountsGlobals.summonRandom('flying');
 	</Binding>
-	<Binding name="CRAZYFORMOUNTS_SUMMON_GROUND" category="BINDING_HEADER_CRAZYFORMOUNTS">
+	<Binding name="CRAZYFORMOUNTS_SUMMON_GROUND" category="ADDONS">
 		CrazyForMountsGlobals.summonRandom('ground');
 	</Binding>
 </Bindings>

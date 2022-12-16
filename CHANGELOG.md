@@ -1,3 +1,6 @@
+## v2.1.4
+- Fixed interface taint (changed bindings `category` to `ADDON`)
+
 ## v2.1.3
 - Update for Dragonflight (10.0.2) (new interface number)
 - *Known bug*: Personal favorite icons only update when scrolling with mouse wheel, not when dragging the scroll bar
