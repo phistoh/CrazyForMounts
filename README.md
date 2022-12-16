@@ -10,17 +10,9 @@ Select both ground and flying mounts via checkbox in the mount journal from whic
 - **Bindings.xml** is needed to provide keybinds
 - **horse.tga** and **bird.tga** are used as backgrounds for the checkboxes
 
-## Changes
-- **2.1.2**: Update for Chains of Domination (9.1.0) (new interface number)
-- **2.1.1**: Update for Shadowlands (9.0.5) (new interface number)
-- **2.1**: Mounts in mount journal scroll list now show icons if they're marked as personal favorites
-- **2.0b**: Table of mounts is now generated ingame (checkboxes in the mount journal) and saved per character (using WoW's saved variables)
-- **1.2**: Now checks player level in addition to flyable status of an area
-- **1.1a**: Now uses a table of (mount name, mount id) pairs to summon mounts
-- **1.0**: Initial release
-
 ## To-Do
 - [ ] Filtering/searching of personal favorites
-- [x] Mark selected mounts in the scroll list
-- [x] Implement the generation of (mount name, mount id) table (using saved vars?)
-- [x] Don't use a table of tables, use the "inner" tables directly instead
+- [ ] Implement Dragon riding
+
+## Known Bugs
+- Personal favorite icons only update when scrolling with mouse wheel, not when dragging the scroll bar

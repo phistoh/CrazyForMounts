@@ -6,8 +6,8 @@ phisFrame:RegisterEvent('ADDON_LOADED')
 -- controls whether non-flying mounts can be added to the table of flying mounts
 local locked = true
 
--- controls the icons to indicate persopnal favorites
-local personalFavoriteIcons = nil
+-- controls the icons to indicate personal favorites
+local personalFavoriteIcons = {}
 
 -- key binding globals
 BINDING_HEADER_CRAZYFORMOUNTS = addonName
@@ -105,7 +105,7 @@ local function createCheckbox(name, parent, anchor, relativeFrame, relativePoint
 end
 
 local function createPersonalFavoriteIcon(name, parent)
-	personalFavoriteIcon = parent:CreateTexture(name, 'HIGH')
+	personalFavoriteIcon = parent:CreateTexture(addonName..name, 'OVERLAY', nil, 0)
 	personalFavoriteIcon:SetAtlas('PetJournal-FavoritesIcon', true)
 	personalFavoriteIcon:SetPoint('RIGHT', parent, 'RIGHT', -2, 0)
 	personalFavoriteIcon:SetDesaturated(true)
@@ -119,23 +119,27 @@ end
 -------------------------
 -- updates the list to star icons in the scroll frame on personal favorites
 local function updateList()
+	-- since frames get reused, hide all favorite icons before opening the journal to make sure that a frame which now shows a non favorite pet does not keep its icon
+	for _, v in pairs(personalFavoriteIcons) do
+		v:Hide()
+	end
+
 	if MountJournal:IsVisible() then
+	
+		local currentView = MountJournal.ScrollBox:GetView()
+		local visibleMountCards = currentView:GetFrames()
 		
-		if personalFavoriteIcons == nil or getLength(personalFavoriteIcons) ~= #MountJournal.ListScrollFrame.buttons then
-			personalFavoriteIcons = {}
-			for i=1,#MountJournal.ListScrollFrame.buttons do
-				personalFavoriteIcons[i] = createPersonalFavoriteIcon('MountJournalListScrollFrameButton'..i..'.personalFavoriteIcon', _G["MountJournalListScrollFrameButton"..i])
-				personalFavoriteIcons[i]:Hide()
+		for k, v in pairs(visibleMountCards) do
+			local mountID = v.mountID
+			
+			if personalFavoriteIcons[v] == nil then
+				personalFavoriteIcons[v] = createPersonalFavoriteIcon('.visibleMountCards.personalFavoriteIcon', v)
 			end
-		end
-		
-		local offset = HybridScrollFrame_GetOffset(MountJournal.ListScrollFrame)
-		for i=1,#MountJournal.ListScrollFrame.buttons do
-			_, _, _, _, _, _, _, _, _, _, _, mountID = C_MountJournal.GetDisplayedMountInfo(i + offset)
+			personalFavoriteIcons[v]:Hide()
+			
+			-- only show the icon again if the frame contains a pet whose petID is in the set of personal favorites
 			if personalMountDB['ground'][mountID] ~= nil or personalMountDB['flying'][mountID] ~= nil then
-				personalFavoriteIcons[i]:Show()
-			else
-				personalFavoriteIcons[i]:Hide()
+				personalFavoriteIcons[v]:Show()
 			end
 		end
 	end
@@ -250,8 +254,8 @@ local function initAddon()
 		end
 	end)
 	
-	hooksecurefunc("MountJournal_UpdateMountList",updateList)
-	MountJournalListScrollFrameScrollBar:HookScript("OnValueChanged",updateList)
+	hooksecurefunc('MountJournal_UpdateMountList',updateList)
+	MountJournal.ScrollBox:HookScript('OnMouseWheel', updateList)
 	
 	personalMountCount.ground = getLength(personalMountDB.ground)
 	personalMountCount.flying = getLength(personalMountDB.flying)
