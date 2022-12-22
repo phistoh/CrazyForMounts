@@ -1,3 +1,7 @@
+## v2.1.5
+- Includes Dragonriding and the respective mounts
+- New CC0 icons for the checkboxes
+
 ## v2.1.4
 - Fixed interface taint (changed bindings `category` to `ADDON`)
 
