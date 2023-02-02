@@ -1,6 +1,6 @@
-## Interface: 100002
+## Interface: 100005
 ## Title: CrazyForMounts
-## Version: 2.1.5
+## Version: 2.1.6
 ## Author: phistoh
 ## Notes: Provides a command to summon a random mount from a predefined table.
 ## X-Curse-Project-ID: 460270
