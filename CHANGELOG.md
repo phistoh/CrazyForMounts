@@ -1,3 +1,6 @@
+## v2.1.6
+- Update for Dragonflight (10.0.5) (new interface number)
+
 ## v2.1.5
 - Includes Dragonriding and the respective mounts
 - New CC0 icons for the checkboxes
