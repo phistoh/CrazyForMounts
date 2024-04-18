@@ -43,6 +43,21 @@ local function addonPrint(str)
 	print('|cFF40C7EB'..addonName..':|r '..str)
 end
 
+-- checks whether the player has the respective spells to allow Dragonriding in the Amirdrassil raid
+function phis.HasDragonridingBuffs()
+	-- Empowered Feather
+	if C_UnitAuras.GetPlayerAuraBySpellID(422510) then
+		return true
+	end
+	
+	-- Blessing of the Emerald Dream
+	if C_UnitAuras.GetPlayerAuraBySpellID(429226) then
+		return true
+	end
+
+	return false
+end
+
 -- checks whether the player can actually fly
 function phis.IsFlyableArea()
 	-- default WoW check
@@ -73,8 +88,9 @@ function phis.IsDragonRidableArea()
 		return false
 	end
 	
-	-- check if in instance (https://wowpedia.fandom.com/wiki/API_IsInInstance)
-	if IsInInstance() then
+	-- check if in instance -> https://warcraft.wiki.gg/wiki/API_IsInInstance
+	-- nake exceptions if the player has either 'Empowered Feather' or ''
+	if IsInInstance() and not phis.HasDragonridingBuffs() then
 		return false
 	end
 	
@@ -252,7 +268,9 @@ end
 
 local function toggleRidingFlag(output)
 	ridingFlag = not ridingFlag
-	checkBoxToggleRiding:SetChecked(ridingFlag)
+	if checkBoxToggleRiding then
+		checkBoxToggleRiding:SetChecked(ridingFlag)
+	end
 	if output then
 		addonPrint('Using '..(ridingFlag and 'Dragonriding' or 'flying')..' mounts in all flying zones.')
 	end
@@ -370,6 +388,7 @@ local function initAddon()
 	personalMountCount.ground = getLength(personalMountDB.ground)
 	personalMountCount.flying = getLength(personalMountDB.flying)
 	personalMountCount.riding = getLength(personalMountDB.riding)
+	checkBoxToggleRiding:SetChecked(ridingFlag)
 end
 
 -- checks if both the addon itself and the Blizzard Collections addon are loaded

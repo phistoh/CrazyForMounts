@@ -1,3 +1,7 @@
+## v2.2.2-beta
+- Fixed an error when using the Dragonriding toggle keybind before opening the mount journal
+- Implemented a check whether the player has the 'Empowered Feather' or 'Blessing of the Emerald Dream' buff and let them dragonride even inside an instance (i.e. Amirdrassil raid); not really tested since I don't have a suitable character
+
 ## v2.2.1-beta
 - Implemented a keybinding to toggle Dragonriding in non-Dragonflight zones
 - WoW's `IsFlyableArea()` method seems to respect the *Dragonflight Pathfinder* achievement; so there is (probably) no special edge case handling required
