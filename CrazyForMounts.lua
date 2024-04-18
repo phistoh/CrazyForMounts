@@ -64,7 +64,7 @@ function phis.IsFlyableArea()
 	return true
 end
 
--- checks whether the player can actually use dragon riding
+-- checks whether the player can actually use Dragonriding
 function phis.IsDragonRidableArea()
 	-- check if player has (no) mounts for Dragonriding
 	local collectedDragonridingMounts = C_MountJournal.GetCollectedDragonridingMounts() 
@@ -89,7 +89,8 @@ function phis.IsDragonRidableArea()
 		end
 	end
 	
-	return false
+	-- since Dragonriding is available wherever flying is allowed, check whether the area is flyable
+	return ridingFlag and phis.IsFlyableArea()
 end
 
 -------------------------
@@ -194,7 +195,7 @@ local function summonRandom(mountType)
 	if IsMounted() then
 		Dismount()
 		return
-	end	
+	end
 	
 	-- if mountType is nil select the appropriate mount table
 	-- else select the table corresponding to the given argument
@@ -274,11 +275,23 @@ local function initAddon()
 		local _, _, _, classColor = GetClassColor(playerClass)
 		addonPrint('Addon loaded for the first time on |c'..classColor..playerName..'|r-'..playerRealm..'.')
 	end
+	
+	if ridingFlag == nil then
+		ridingFlag = false
+	end
 
 	--- CREATE AND ATTACH FRAMES ---
 	local groundMountInset = createInset('groundMountInset', MountJournal, 100, 20, 'BOTTOMRIGHT', -7, 5, 'Ground: ', personalMountCount.ground)
 	local flyingMountInset = createInset('flyingMountInset', groundMountInset, 100, 20, 'LEFT', -110, 0, 'Flying: ', personalMountCount.flying)
 	local ridingMountInset = createInset('ridingMountInset', flyingMountInset, 120, 20, 'LEFT', -130, 0, 'Dragonriding: ', personalMountCount.riding)
+	
+	local checkBoxRiding = createCheckbox('CrazyForMountsCheckBoxRiding', MountJournal, 'RIGHT', ridingMountInset, 'LEFT', -8, -1, 'Use Dragonriding instead of flying', 'Interface\\Addons\\CrazyForMounts\\Icons\\dragon')
+	checkBoxRiding:SetScript('OnClick', function(self)
+		local checked = self:GetChecked()
+		PlaySound(checked and SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF)
+		ridingFlag = checked
+	end)
+	checkBoxRiding:SetScale(0.8)
 	
 	-- icons are from (all with CC0 license):
 	-- https://www.pngrepo.com/svg/307488/dragon-with-wings-monster-legend-myth
@@ -322,17 +335,12 @@ local function initAddon()
 		checkBoxRiding:SetChecked(personalMountDB.riding[mountID] == true)
 		
 		local _, _, _, _, mountType = C_MountJournal.GetMountInfoExtraByID(mountID)
-		-- disable checking Dragonriding mounts as ground mounts (because they can only be used in the Dragon Isles)
-		checkBoxGround:Enable()
-		checkBoxGround:SetAlpha(1)
-		if hasValue(C_MountJournal.GetCollectedDragonridingMounts(), mountID) and locked then
-			checkBoxGround:SetAlpha(0.5)
-			checkBoxGround:Disable()
-		end
 		-- disable checking non-flying mounts as flying mounts
 		checkBoxFlying:Enable()
 		checkBoxFlying:SetAlpha(1)
-		if mountType ~= 248 and locked then
+		-- 248 encompasses most flying mounts
+		-- 424 encompasses flying mounts which can potentially be used as Dragonriding mounts (e.g. Nether Drakes)
+		if mountType ~= 248 and mountType ~= 424 and locked then
 			checkBoxFlying:SetAlpha(0.5)
 			checkBoxFlying:Disable()
 		end

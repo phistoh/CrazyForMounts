@@ -1,3 +1,8 @@
+## v2.2-beta
+- Update for Dragonflight (10.2.6) (new interface number)
+- Checkbox to use Dragonflying in "ordinary" flyable zones
+- *Not yet implemented*: Edge case handling when the player doen't have the *Dragonflight Pathfinder* achievement and switches the Dragonflying checkbox off
+
 ## v2.1.7
 - Update for Dragonflight (10.2.0) (new interface number)
 - Icon in `toc` file

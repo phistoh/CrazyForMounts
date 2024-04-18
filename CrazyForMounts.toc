@@ -1,11 +1,11 @@
-## Interface: 100200
+## Interface: 100206
 ## Title: CrazyForMounts
-## Version: 2.1.7
+## Version: 2.2-beta
 ## Author: phistoh
 ## Notes: Provides a command to summon a random mount from a predefined table.
 ## IconTexture: 132261
 ## X-Curse-Project-ID: 460270
 ## X-WoWI-ID: 25904
-## SavedVariablesPerCharacter: personalMountDB, personalMountCount
+## SavedVariablesPerCharacter: personalMountDB, personalMountCount, ridingFlag
 
 CrazyForMounts.lua
