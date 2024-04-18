@@ -30,7 +30,8 @@ Select ground, flying and Dragonriding mounts via checkbox in the mount journal 
 ## To-Do
 - [ ] Filtering/searching of personal favorites
 - [x] Implement Dragon riding
-- [ ] Edge case handling when the player doen't have the *Dragonflight Pathfinder* achievement and switches the Dragonflying checkbox off (this means I need to get the Dragonflight Pathfinder achievement myself)
+- [x] Edge case handling when the player doen't have the *Dragonflight Pathfinder* achievement and switches the Dragonflying checkbox off (this means I need to get the Dragonflight Pathfinder achievement myself)
+	- WoW's `IsFlyableArea()` method seems to respect the achievement and the addon logic probably functions as expected
 
 ## Known Bugs
 - Personal favorite icons only update when scrolling with mouse wheel, not when dragging the scroll bar

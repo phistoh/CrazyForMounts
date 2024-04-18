@@ -15,6 +15,7 @@ BINDING_NAME_CRAZYFORMOUNTS_SUMMON_RANDOM = "Summon random mount"
 BINDING_NAME_CRAZYFORMOUNTS_SUMMON_FLYING = "Summon random flying mount"
 BINDING_NAME_CRAZYFORMOUNTS_SUMMON_GROUND = "Summon random ground mount"
 BINDING_NAME_CRAZYFORMOUNTS_SUMMON_RIDING = "Summon random dragonriding mount"
+BINDING_NAME_CRAZYFORMOUNTS_TOGGLE_RIDING = "Toggle Dragonriding in non-Dragonflight zones"
 CrazyForMountsGlobals = {}
 
 -------------------------
@@ -249,6 +250,16 @@ local function updateDB(mountID, mountType, addMount)
 	end
 end
 
+local function toggleRidingFlag(output)
+	ridingFlag = not ridingFlag
+	checkBoxToggleRiding:SetChecked(ridingFlag)
+	if output then
+		addonPrint('Using '..(ridingFlag and 'Dragonriding' or 'flying')..' mounts in all flying zones.')
+	end
+end
+-- add to globals for keybindings
+CrazyForMountsGlobals.toggleRidingFlag = toggleRidingFlag
+
 local function initAddon()
 	--- SETUP VARIABLES ---
 	
@@ -285,13 +296,13 @@ local function initAddon()
 	local flyingMountInset = createInset('flyingMountInset', groundMountInset, 100, 20, 'LEFT', -110, 0, 'Flying: ', personalMountCount.flying)
 	local ridingMountInset = createInset('ridingMountInset', flyingMountInset, 120, 20, 'LEFT', -130, 0, 'Dragonriding: ', personalMountCount.riding)
 	
-	local checkBoxRiding = createCheckbox('CrazyForMountsCheckBoxRiding', MountJournal, 'RIGHT', ridingMountInset, 'LEFT', -8, -1, 'Use Dragonriding instead of flying', 'Interface\\Addons\\CrazyForMounts\\Icons\\dragon')
-	checkBoxRiding:SetScript('OnClick', function(self)
+	checkBoxToggleRiding = createCheckbox('CrazyForMountsCheckBoxRiding', MountJournal, 'RIGHT', ridingMountInset, 'LEFT', -8, -1, 'Use Dragonriding instead of flying', 'Interface\\Addons\\CrazyForMounts\\Icons\\dragon')
+	checkBoxToggleRiding:SetScript('OnClick', function(self)
 		local checked = self:GetChecked()
 		PlaySound(checked and SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF)
 		ridingFlag = checked
 	end)
-	checkBoxRiding:SetScale(0.8)
+	checkBoxToggleRiding:SetScale(0.8)
 	
 	-- icons are from (all with CC0 license):
 	-- https://www.pngrepo.com/svg/307488/dragon-with-wings-monster-legend-myth
