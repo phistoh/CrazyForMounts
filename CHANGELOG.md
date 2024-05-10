@@ -1,3 +1,6 @@
+## v2.2.3-beta
+- Update for Dark Heart (10.2.7) (new interface number)
+
 ## v2.2.2-beta
 - Fixed an error when using the Dragonriding toggle keybind before opening the mount journal
 - Implemented a check whether the player has the 'Empowered Feather' or 'Blessing of the Emerald Dream' buff and let them dragonride even inside an instance (i.e. Amirdrassil raid); not really tested since I don't have a suitable character
