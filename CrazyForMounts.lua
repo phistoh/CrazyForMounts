@@ -63,10 +63,11 @@ function phis.IsFlyableArea()
 	-- default WoW check
 	if not IsFlyableArea() then
 		return false
+	-- temporarily commented out for World of Warcraft Remix: Mists of Pandaria
 	-- flying requires Level 30
-	elseif UnitLevel("player") < 30 then
-		return false
-	end
+	-- elseif UnitLevel("player") < 30 then
+		-- return false
+	-- end
 	
 	-- no flying in Warfronts
 	local _, instanceType = IsInInstance()

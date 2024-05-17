@@ -1,3 +1,7 @@
+## v2.2.4
+- Removed the level check in `phis.IsFlyableArea()` (since *World of Warcraft Remix: Mists of Pandaria* allows flying on a lower level)
+- Removed thwe beta version indicator from the addon version (though I have not yet tested, if dragonriding inside Amirdrassil works)
+
 ## v2.2.3-beta
 - Update for Dark Heart (10.2.7) (new interface number)
 
