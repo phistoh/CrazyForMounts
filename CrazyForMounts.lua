@@ -67,7 +67,7 @@ function phis.IsFlyableArea()
 	-- flying requires Level 30
 	-- elseif UnitLevel("player") < 30 then
 		-- return false
-	-- end
+	end
 	
 	-- no flying in Warfronts
 	local _, instanceType = IsInInstance()
