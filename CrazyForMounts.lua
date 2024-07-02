@@ -90,8 +90,10 @@ function phis.IsDragonRidableArea()
 	end
 	
 	-- check if in instance -> https://warcraft.wiki.gg/wiki/API_IsInInstance
-	-- nake exceptions if the player has either 'Empowered Feather' or ''
-	if IsInInstance() and not phis.HasDragonridingBuffs() then
+	-- make exceptions if the player has either 'Empowered Feather' or ''
+	-- make exception if the player is in The Nokhud Offensive
+	_, _, _, _, _, _, _, instanceID = GetInstanceInfo()
+	if IsInInstance() and not (phis.HasDragonridingBuffs() or instanceID == 2516) then
 		return false
 	end
 	
@@ -229,12 +231,15 @@ local function summonRandom(mountType)
 		canRide = true
 	end
 	
-	if canRide then
+	if ridingFlag and canRide then
 		tmpCount = (personalMountCount.riding or 0)
 		tmpMountDB = (personalMountDB.riding or {})
 	elseif canFly then
 		tmpCount = (personalMountCount.flying or 0)
 		tmpMountDB = (personalMountDB.flying or {})
+	elseif canRide then 
+		tmpCount = (personalMountCount.riding or 0)
+		tmpMountDB = (personalMountDB.riding or {})
 	else
 		tmpCount = (personalMountCount.ground or 0)
 		tmpMountDB = (personalMountDB.ground or {})
