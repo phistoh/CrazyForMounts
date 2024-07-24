@@ -1,3 +1,9 @@
+## v2.3.5
+- Update for The War Within (11.0.0) (new interface number)
+- Differentiates between Skyriding and steady flying mounts depending on the chosen flight style
+- Since (most) flying mounts can be used for Skyriding, the addon includes a checkbox to combine both tables---Skyriding and steady flying mounts---when a mount of a non-specified type is summoned
+- Removed Dragonriding toggle (and keybind) since it is now controlled via WoW's own flight style toggle
+
 ## v2.2.5
 - Fixed Dragonriding toggle priority (in the Dragon Isles---when having the pathfinder achievement)
 - Allowed dragonriding in The Nokhud Offensive

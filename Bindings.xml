@@ -11,7 +11,4 @@
 	<Binding name="CRAZYFORMOUNTS_SUMMON_RIDING" category="ADDONS">
 		CrazyForMountsGlobals.summonRandom('riding');
 	</Binding>
-	<Binding name="CRAZYFORMOUNTS_TOGGLE_RIDING" category="ADDONS">
-		CrazyForMountsGlobals.toggleRidingFlag(true);
-	</Binding>
 </Bindings>

@@ -14,8 +14,7 @@ BINDING_HEADER_CRAZYFORMOUNTS = addonName
 BINDING_NAME_CRAZYFORMOUNTS_SUMMON_RANDOM = "Summon random mount"
 BINDING_NAME_CRAZYFORMOUNTS_SUMMON_FLYING = "Summon random flying mount"
 BINDING_NAME_CRAZYFORMOUNTS_SUMMON_GROUND = "Summon random ground mount"
-BINDING_NAME_CRAZYFORMOUNTS_SUMMON_RIDING = "Summon random dragonriding mount"
-BINDING_NAME_CRAZYFORMOUNTS_TOGGLE_RIDING = "Toggle Dragonriding in non-Dragonflight zones"
+BINDING_NAME_CRAZYFORMOUNTS_SUMMON_RIDING = "Summon random Skyriding mount"
 CrazyForMountsGlobals = {}
 
 -------------------------
@@ -43,8 +42,8 @@ local function addonPrint(str)
 	print('|cFF40C7EB'..addonName..':|r '..str)
 end
 
--- checks whether the player has the respective spells to allow Dragonriding in the Amirdrassil raid
-function phis.HasDragonridingBuffs()
+-- checks whether the player has the respective spells to allow Skyriding in the Amirdrassil raid
+function phis.HasSkyridingBuffs()
 	-- Empowered Feather
 	if C_UnitAuras.GetPlayerAuraBySpellID(422510) then
 		return true
@@ -59,14 +58,16 @@ function phis.HasDragonridingBuffs()
 end
 
 -- checks whether the player can actually fly
-function phis.IsFlyableArea()
+-- flyingLevel as argument because flying and Skyriding have different requirements
+function phis.IsFlyableArea(flyingLevel)
+	if flyingLevel == nil then
+		flyingLevel = 20
+	end
 	-- default WoW check
 	if not IsFlyableArea() then
 		return false
-	-- temporarily commented out for World of Warcraft Remix: Mists of Pandaria
-	-- flying requires Level 30
-	-- elseif UnitLevel("player") < 30 then
-		-- return false
+	elseif UnitLevel("player") < flyingLevel then
+		return false
 	end
 	
 	-- no flying in Warfronts
@@ -81,11 +82,16 @@ function phis.IsFlyableArea()
 	return true
 end
 
--- checks whether the player can actually use Dragonriding
-function phis.IsDragonRidableArea()
-	-- check if player has (no) mounts for Dragonriding
-	local collectedDragonridingMounts = C_MountJournal.GetCollectedDragonridingMounts() 
-	if not collectedDragonridingMounts or getLength(collectedDragonridingMounts) == 0 then
+-- checks whether the player can actually use Skyriding
+function phis.IsSkyridableArea()
+	-- check if player has (no) mounts for Skyriding
+	local collectedSkyridingMounts = C_MountJournal.GetCollectedDragonridingMounts() 
+	if not collectedSkyridingMounts or getLength(collectedSkyridingMounts) == 0 then
+		return false
+	end
+	
+	-- check if the player has the Steady flight style buff active
+	if C_UnitAuras.GetPlayerAuraBySpellID(404468) then
 		return false
 	end
 	
@@ -93,24 +99,12 @@ function phis.IsDragonRidableArea()
 	-- make exceptions if the player has either 'Empowered Feather' or ''
 	-- make exception if the player is in The Nokhud Offensive
 	_, _, _, _, _, _, _, instanceID = GetInstanceInfo()
-	if IsInInstance() and not (phis.HasDragonridingBuffs() or instanceID == 2516) then
+	if IsInInstance() and not (phis.HasSkyridingBuffs() or instanceID == 2516) then
 		return false
 	end
 	
-	-- check if in Dragon isles -> loop over parent map ids until id == 1978 or id == nil or id == 0
-	local mapID = C_Map.GetBestMapForUnit('player')
-	while mapID and mapID ~= 0 do
-		if mapID == 1978 then
-			return true
-		end
-		local mapInfo = C_Map.GetMapInfo(mapID)
-		if mapInfo then
-			mapID = mapInfo.parentMapID
-		end
-	end
-	
-	-- since Dragonriding is available wherever flying is allowed, check whether the area is flyable
-	return ridingFlag and phis.IsFlyableArea()
+	-- since Skyriding is available wherever flying is allowed, check whether the area is flyable
+	return phis.IsFlyableArea(10)
 end
 
 -------------------------
@@ -219,27 +213,34 @@ local function summonRandom(mountType)
 	
 	-- if mountType is nil select the appropriate mount table
 	-- else select the table corresponding to the given argument
-	-- prioritizes Dragonriding mounts over flying mounts
+	-- prioritizes Skyriding mounts over flying mounts
+	-- only combines flying and Skyriding mounts if no mountType is given
 	local canFly = false
 	local canRide = false
 	if mountType == nil then
 		canFly = phis.IsFlyableArea()
-		canRide = phis.IsDragonRidableArea()
+		canRide = phis.IsSkyridableArea()
 	elseif mountType == 'flying' then
 		canFly = true
 	elseif mountType == 'riding' then
 		canRide = true
 	end
 	
-	if ridingFlag and canRide then
+	if combineSkyridingAndFlyingFlag and mountType == nil then
+		tmpMountDB = {}
+		for k,v in pairs(personalMountDB.riding) do
+			tmpMountDB[k] = v
+		end
+		for k,v in pairs(personalMountDB.flying) do
+			tmpMountDB[k] = v
+		end
+		tmpCount = getLength(tmpMountDB)
+	elseif canRide then
 		tmpCount = (personalMountCount.riding or 0)
 		tmpMountDB = (personalMountDB.riding or {})
 	elseif canFly then
 		tmpCount = (personalMountCount.flying or 0)
 		tmpMountDB = (personalMountDB.flying or {})
-	elseif canRide then 
-		tmpCount = (personalMountCount.riding or 0)
-		tmpMountDB = (personalMountDB.riding or {})
 	else
 		tmpCount = (personalMountCount.ground or 0)
 		tmpMountDB = (personalMountDB.ground or {})
@@ -254,7 +255,7 @@ local function summonRandom(mountType)
 		local mountID = tmpIDs[math.random(#tmpIDs)]
 		C_MountJournal.SummonByID(mountID)
 	else
-		addonPrint('No personal '..(canRide and 'Dragonriding' or (canFly and 'flying' or 'ground'))..' mounts set.')
+		addonPrint('No personal '..(canRide and 'Skyriding' or (canFly and 'flying' or 'ground'))..' mounts set.')
 	end
 end
 -- add to globals for keybindings
@@ -271,18 +272,6 @@ local function updateDB(mountID, mountType, addMount)
 		personalMountCount[mountType] = math.max(personalMountCount[mountType] - 1, 0)
 	end
 end
-
-local function toggleRidingFlag(output)
-	ridingFlag = not ridingFlag
-	if checkBoxToggleRiding then
-		checkBoxToggleRiding:SetChecked(ridingFlag)
-	end
-	if output then
-		addonPrint('Using '..(ridingFlag and 'Dragonriding' or 'flying')..' mounts in all flying zones.')
-	end
-end
--- add to globals for keybindings
-CrazyForMountsGlobals.toggleRidingFlag = toggleRidingFlag
 
 local function initAddon()
 	--- SETUP VARIABLES ---
@@ -311,22 +300,22 @@ local function initAddon()
 		addonPrint('Addon loaded for the first time on |c'..classColor..playerName..'|r-'..playerRealm..'.')
 	end
 	
-	if ridingFlag == nil then
-		ridingFlag = false
+	if combineSkyridingAndFlyingFlag == nil then
+		combineSkyridingAndFlyingFlag = false
 	end
 
 	--- CREATE AND ATTACH FRAMES ---
 	local groundMountInset = createInset('groundMountInset', MountJournal, 100, 20, 'BOTTOMRIGHT', -7, 5, 'Ground: ', personalMountCount.ground)
 	local flyingMountInset = createInset('flyingMountInset', groundMountInset, 100, 20, 'LEFT', -110, 0, 'Flying: ', personalMountCount.flying)
-	local ridingMountInset = createInset('ridingMountInset', flyingMountInset, 120, 20, 'LEFT', -130, 0, 'Dragonriding: ', personalMountCount.riding)
+	local ridingMountInset = createInset('ridingMountInset', flyingMountInset, 120, 20, 'LEFT', -130, 0, 'Skyriding: ', personalMountCount.riding)
 	
-	checkBoxToggleRiding = createCheckbox('CrazyForMountsCheckBoxRiding', MountJournal, 'RIGHT', ridingMountInset, 'LEFT', -8, -1, 'Use Dragonriding instead of flying', 'Interface\\Addons\\CrazyForMounts\\Icons\\dragon')
-	checkBoxToggleRiding:SetScript('OnClick', function(self)
+	checkBoxCombineSkyridingAndFlying = createCheckbox('CrazyForMountsCheckBoxRiding', MountJournal, 'RIGHT', ridingMountInset, 'LEFT', -8, -1, 'Combine Skyriding and flying mounts', 'Interface\\Addons\\CrazyForMounts\\Icons\\dragon')
+	checkBoxCombineSkyridingAndFlying:SetScript('OnClick', function(self)
 		local checked = self:GetChecked()
 		PlaySound(checked and SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF)
-		ridingFlag = checked
+		combineSkyridingAndFlyingFlag = checked
 	end)
-	checkBoxToggleRiding:SetScale(0.8)
+	checkBoxCombineSkyridingAndFlying:SetScale(0.8)
 	
 	-- icons are from (all with CC0 license):
 	-- https://www.pngrepo.com/svg/307488/dragon-with-wings-monster-legend-myth
@@ -353,7 +342,7 @@ local function initAddon()
 		flyingMountInset.content:SetText(personalMountCount.flying)
 	end)
 	
-	local checkBoxRiding = createCheckbox('CrazyForMountsCheckBoxRiding', MountJournal.MountDisplay, 'LEFT', checkBoxFlying, 'RIGHT', 10, 0, 'Add this mount to your personal Dragonriding mounts', 'Interface\\Addons\\CrazyForMounts\\Icons\\dragon')
+	local checkBoxRiding = createCheckbox('CrazyForMountsCheckBoxRiding', MountJournal.MountDisplay, 'LEFT', checkBoxFlying, 'RIGHT', 10, 0, 'Add this mount to your personal Skyriding mounts', 'Interface\\Addons\\CrazyForMounts\\Icons\\dragon')
 	checkBoxRiding:SetScript('OnClick', function(self)
 		local checked = self:GetChecked()
 		PlaySound(checked and SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF)
@@ -374,15 +363,17 @@ local function initAddon()
 		checkBoxFlying:Enable()
 		checkBoxFlying:SetAlpha(1)
 		-- 248 encompasses most flying mounts
-		-- 424 encompasses flying mounts which can potentially be used as Dragonriding mounts (e.g. Nether Drakes)
-		if mountType ~= 248 and mountType ~= 424 and locked then
+		-- 402 encompasses (explicit) Dragonriding mounts
+		-- 424 encompasses flying mounts which can potentially be used as Skyriding mounts (e.g. Nether Drakes)
+		-- 437 encompasses amongst other things the disc like mounts
+		if not hasValue({248, 402, 424, 437}, mountType) and locked then
 			checkBoxFlying:SetAlpha(0.5)
 			checkBoxFlying:Disable()
 		end
-		-- disable non-Dragonriding mounts as Dragonriding mounts
+		-- disable non-Skyriding mounts as Skyriding mounts
 		checkBoxRiding:Enable()
 		checkBoxRiding:SetAlpha(1)
-		if not hasValue(C_MountJournal.GetCollectedDragonridingMounts(), mountID) and locked then
+		if mountType ~= 402 and mountType ~= 424 and locked then
 			checkBoxRiding:SetAlpha(0.5)
 			checkBoxRiding:Disable()
 		end
@@ -394,7 +385,7 @@ local function initAddon()
 	personalMountCount.ground = getLength(personalMountDB.ground)
 	personalMountCount.flying = getLength(personalMountDB.flying)
 	personalMountCount.riding = getLength(personalMountDB.riding)
-	checkBoxToggleRiding:SetChecked(ridingFlag)
+	checkBoxCombineSkyridingAndFlying:SetChecked(combineSkyridingAndFlyingFlag)
 end
 
 -- checks if both the addon itself and the Blizzard Collections addon are loaded
@@ -421,19 +412,19 @@ SlashCmdList['CFM'] = function(msg)
 	local arg1, arg2 = strsplit(' ', msg)
 	if arg1:lower() == 'toggle' then
 		locked = not locked
-		addonPrint('Setting non-flying mounts as flying or Dragonriding mounts is now '..(locked and 'locked' or 'unlocked')..'.')
+		addonPrint('Setting non-flying mounts as flying or Skyriding mounts is now '..(locked and 'locked' or 'unlocked')..'.')
 		if MountJournal then
 			MountJournal_UpdateMountDisplay(true)
 		end
 	elseif arg1:lower() == 'lock' then
 		locked = true
-		addonPrint('Setting non-flying mounts as flying or Dragonriding mounts is now locked.')
+		addonPrint('Setting non-flying mounts as flying or Skyriding mounts is now locked.')
 		if MountJournal then
 			MountJournal_UpdateMountDisplay(true)
 		end
 	elseif arg1:lower() == 'unlock' then
 		locked = false
-		addonPrint('Setting non-flying mounts as flying or Dragonriding mounts is now unlocked.')
+		addonPrint('Setting non-flying mounts as flying or Skyriding mounts is now unlocked.')
 		if MountJournal then
 			MountJournal_UpdateMountDisplay(true)
 		end
