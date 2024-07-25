@@ -1,3 +1,7 @@
+## v2.3.7
+- New icon for combine checkbox
+- Allowed all flying mounts as Skyriding mounts (and vice versa)
+
 ## v2.3.6
 - Fixed a bug where a flying or skyriding mount was summoned instead of a ground mount, when using the *Summon random* command while the combination of flying and Skyriding mount tables was active
 

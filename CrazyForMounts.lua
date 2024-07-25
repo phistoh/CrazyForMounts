@@ -309,7 +309,7 @@ local function initAddon()
 	local flyingMountInset = createInset('flyingMountInset', groundMountInset, 100, 20, 'LEFT', -110, 0, 'Flying: ', personalMountCount.flying)
 	local ridingMountInset = createInset('ridingMountInset', flyingMountInset, 120, 20, 'LEFT', -130, 0, 'Skyriding: ', personalMountCount.riding)
 	
-	checkBoxCombineSkyridingAndFlying = createCheckbox('CrazyForMountsCheckBoxRiding', MountJournal, 'RIGHT', ridingMountInset, 'LEFT', -8, -1, 'Combine Skyriding and flying mounts', 'Interface\\Addons\\CrazyForMounts\\Icons\\dragon')
+	checkBoxCombineSkyridingAndFlying = createCheckbox('CrazyForMountsCheckBoxRiding', MountJournal, 'RIGHT', ridingMountInset, 'LEFT', -8, -1, 'Combine Skyriding and flying mounts', 'Interface\\Addons\\CrazyForMounts\\Icons\\union')
 	checkBoxCombineSkyridingAndFlying:SetScript('OnClick', function(self)
 		local checked = self:GetChecked()
 		PlaySound(checked and SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF)
@@ -321,6 +321,7 @@ local function initAddon()
 	-- https://www.pngrepo.com/svg/307488/dragon-with-wings-monster-legend-myth
 	-- https://www.pngrepo.com/svg/37053/flying-dove-bird-shape
 	-- https://www.pngrepo.com/svg/140806/horse-jumping-silhouette
+	-- https://www.pngrepo.com/svg/274318/combine-union
 	
 	local checkBoxGround = createCheckbox('CrazyForMountsCheckBoxGround', MountJournal.MountDisplay, 'TOPLEFT', MountJournal.MountDisplay, 'BOTTOMLEFT', 10, 52, 'Add this mount to your personal ground mounts', 'Interface\\Addons\\CrazyForMounts\\Icons\\horse')
 	checkBoxGround:SetScript('OnClick', function(self)
@@ -362,6 +363,8 @@ local function initAddon()
 		-- disable checking non-flying mounts as flying mounts
 		checkBoxFlying:Enable()
 		checkBoxFlying:SetAlpha(1)
+		checkBoxRiding:Enable()
+		checkBoxRiding:SetAlpha(1)
 		-- 248 encompasses most flying mounts
 		-- 402 encompasses (explicit) Dragonriding mounts
 		-- 424 encompasses flying mounts which can potentially be used as Skyriding mounts (e.g. Nether Drakes)
@@ -369,11 +372,6 @@ local function initAddon()
 		if not hasValue({248, 402, 424, 437}, mountType) and locked then
 			checkBoxFlying:SetAlpha(0.5)
 			checkBoxFlying:Disable()
-		end
-		-- disable non-Skyriding mounts as Skyriding mounts
-		checkBoxRiding:Enable()
-		checkBoxRiding:SetAlpha(1)
-		if mountType ~= 402 and mountType ~= 424 and locked then
 			checkBoxRiding:SetAlpha(0.5)
 			checkBoxRiding:Disable()
 		end
