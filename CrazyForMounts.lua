@@ -226,7 +226,7 @@ local function summonRandom(mountType)
 		canRide = true
 	end
 	
-	if combineSkyridingAndFlyingFlag and mountType == nil then
+	if combineSkyridingAndFlyingFlag and mountType == nil and (canFly or canRide) then
 		tmpMountDB = {}
 		for k,v in pairs(personalMountDB.riding) do
 			tmpMountDB[k] = v

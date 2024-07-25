@@ -1,3 +1,6 @@
+## v2.3.6
+- Fixed a bug where a flying or skyriding mount was summoned instead of a ground mount, when using the *Summon random* command while the combination of flying and Skyriding mount tables was active
+
 ## v2.3.5
 - Update for The War Within (11.0.0) (new interface number)
 - Differentiates between Skyriding and steady flying mounts depending on the chosen flight style
