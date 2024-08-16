@@ -1,3 +1,7 @@
+## v2.3.8
+- Update for The War Within (11.0.2) (new interface number)
+- Changed deprecated function `IsAddOnLoaded` to `C_AddOns.IsAddOnLoaded`
+
 ## v2.3.7
 - New icon for combine checkbox
 - Allowed all flying mounts as Skyriding mounts (and vice versa)

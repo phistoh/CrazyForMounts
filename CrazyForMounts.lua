@@ -389,7 +389,8 @@ end
 -- checks if both the addon itself and the Blizzard Collections addon are loaded
 local function checkInit(self, event, addon)
 	if addon == addonName then
-		if IsAddOnLoaded('Blizzard_Collections') then
+		_, isLoaded = C_AddOns.IsAddOnLoaded('Blizzard_Collections')
+		if isLoaded then
 			initAddon()
 			phisFrame:UnregisterEvent('ADDON_LOADED')
 		end
