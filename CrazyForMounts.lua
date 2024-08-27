@@ -103,6 +103,19 @@ function phis.IsSkyridableArea()
 		return false
 	end
 	
+	-- overwrite for TWW zones
+	local skyridingZonesTWW = {
+		[2248] = true, -- Isle of Dorn
+		[2339] = true, -- Dornogal
+		[2214] = true, -- The Ringing Deeps
+		[2215] = true, -- Hallowfall
+		[2255] = true, -- Azj-Kahet
+	}
+	local mapId = C_Map.GetBestMapForUnit("player")
+	if skyridingZonesTWW[mapId] then
+		return true
+	end
+	
 	-- since Skyriding is available wherever flying is allowed, check whether the area is flyable
 	return phis.IsFlyableArea(10)
 end

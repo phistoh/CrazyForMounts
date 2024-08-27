@@ -1,3 +1,6 @@
+## v2.3.9
+- Fixed Skyriding in Khaz Algar zones (they're not flyable)
+
 ## v2.3.8
 - Update for The War Within (11.0.2) (new interface number)
 - Changed deprecated function `IsAddOnLoaded` to `C_AddOns.IsAddOnLoaded`
