@@ -1,3 +1,6 @@
+## v2.3.10
+- Update for Ghosts of K'aresh (11.2) (update interface number)
+
 ## v2.3.9
 - Fixed Skyriding in Khaz Algar zones (they're not flyable)
 
