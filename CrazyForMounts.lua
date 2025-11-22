@@ -63,8 +63,12 @@ function phis.IsFlyableArea(flyingLevel)
 	if flyingLevel == nil then
 		flyingLevel = 20
 	end
+
+	if not IsOutdoors() then
+		return false
+	end
 	-- default WoW check
-	if not IsFlyableArea() then
+	if not (IsFlyableArea() or IsAdvancedFlyableArea()) then
 		return false
 	elseif UnitLevel("player") < flyingLevel then
 		return false
@@ -110,6 +114,7 @@ function phis.IsSkyridableArea()
 		[2214] = true, -- The Ringing Deeps
 		[2215] = true, -- Hallowfall
 		[2255] = true, -- Azj-Kahet
+		[2213] = true, -- City of Threads
 	}
 	local mapId = C_Map.GetBestMapForUnit("player")
 	if skyridingZonesTWW[mapId] then

@@ -1,3 +1,7 @@
+## v2.3.11
+- Fixed skyriding mounts on K'aresh
+- Fixed skyriding in City of Threads
+
 ## v2.3.10
 - Update for Ghosts of K'aresh (11.2) (update interface number)
 
