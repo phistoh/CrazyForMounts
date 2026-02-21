@@ -1,3 +1,6 @@
+## v2.3.12
+- Update for Midnight (12.0.1) (new interface number)
+
 ## v2.3.11
 - Fixed skyriding mounts on K'aresh
 - Fixed skyriding in City of Threads
